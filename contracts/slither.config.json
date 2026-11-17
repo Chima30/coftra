@@ -1,0 +1,10 @@
+{
+  "filter_paths": "lib/|test/|script/",
+  "exclude_informational": true,
+  "exclude_low": false,
+  "solc_remaps": [
+    "@reactive/=lib/reactive-lib-omni/",
+    "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
+    "forge-std/=lib/forge-std/src/"
+  ]
+}

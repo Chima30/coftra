@@ -1,0 +1,12 @@
+{
+  "token": "0xa4da96908af4cd2cb4dAAde2359deB221B4F03D5",
+  "demoNft": "0x08643a27E03AEef33daBb629091Cf15730b2d4FD",
+  "verifierRegistry": "0x6AF465995710BA15db53D1a0F0867Ed4f38D3291",
+  "originChainId": 84532,
+  "assetsBlock": 60109272,
+  "reactive": "0x17B29bC8400FB88de4c885Af4335983cd09c3D96",
+  "reactiveBlock": 8594319,
+  "vault": "0x2335A6D769bb3f6E6D4B1a48f6926A81aEA5b719",
+  "callbackProxy": "0x476F44b11F5C942c58f4c8E3d0300E5710743585",
+  "vaultBlock": 60111949
+}

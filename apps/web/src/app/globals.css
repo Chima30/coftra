@@ -1,0 +1,109 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Light: paper and ink. Dark: deep navy and charcoal. One accent, used sparingly. */
+:root {
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --surface-2: #f0f2f5;
+  --border: #e1e5eb;
+  --border-strong: #c9d0da;
+  --fg: #0f1a2b;
+  --fg-muted: #556377;
+  --fg-subtle: #7d8899;
+  --accent: #0f766e;
+  --accent-fg: #ffffff;
+  --accent-soft: #e3f3f1;
+  --success: #15803d;
+  --success-soft: #e6f4ea;
+  --warning: #b45309;
+  --warning-soft: #fdf3e2;
+  --danger: #b91c1c;
+  --danger-soft: #fbeaea;
+  --info: #1d4ed8;
+  --info-soft: #e8eefc;
+  --ring: #0f766e;
+}
+
+.dark {
+  --bg: #0b1220;
+  --surface: #111a2b;
+  --surface-2: #162236;
+  --border: #1f2c42;
+  --border-strong: #2b3b56;
+  --fg: #e6ebf2;
+  --fg-muted: #9aa7ba;
+  --fg-subtle: #6c7a90;
+  --accent: #2dd4bf;
+  --accent-fg: #062521;
+  --accent-soft: #0f2e2e;
+  --success: #4ade80;
+  --success-soft: #11291c;
+  --warning: #fbbf24;
+  --warning-soft: #2c2210;
+  --danger: #f87171;
+  --danger-soft: #2e1515;
+  --info: #93b4fd;
+  --info-soft: #152442;
+  --ring: #2dd4bf;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-subtle: var(--fg-subtle);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+  --color-accent-soft: var(--accent-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-ring: var(--ring);
+  --font-sans: var(--font-plex-sans);
+  --font-mono: var(--font-plex-mono);
+}
+
+html {
+  color-scheme: light;
+}
+html.dark {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
