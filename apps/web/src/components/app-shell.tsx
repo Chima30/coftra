@@ -6,6 +6,9 @@ import { Suspense, useEffect, useState, type ReactNode } from "react";
 import { useAccount, useConnect, useDisconnect, useSwitchChain } from "wagmi";
 import {
   Activity,
+  BadgeCheck,
+  BookOpen,
+  FolderGit2,
   LayoutDashboard,
   LayoutTemplate,
   Menu,
@@ -21,9 +24,11 @@ import { destination } from "@/lib/chains";
 import { cn, shortHex } from "@/lib/format";
 import { Button } from "./ui/primitives";
 import { deploymentInfo } from "@/hooks/use-coftra";
+import { LINKS } from "@/lib/evidence";
 
 const nav = [
   { href: "/", label: "Overview", icon: LayoutDashboard },
+  { href: "/proof", label: "Verified demo", icon: BadgeCheck },
   { href: "/vaults", label: "My Vaults", icon: Vault },
   { href: "/create", label: "Create Automation", icon: PlusCircle },
   { href: "/activity", label: "Automation Activity", icon: Activity },
@@ -240,12 +245,22 @@ export function AppShell({ children }: { children: ReactNode }) {
 
 function NetworkFooter() {
   return (
-    <div className="rounded-md border border-border px-3 py-2.5 text-xs text-fg-muted">
-      <div className="flex items-center justify-between">
-        <span>Protocol</span>
-        <span className={deploymentInfo ? "text-success" : "text-warning"}>{deploymentInfo ? "Deployed" : "Not deployed"}</span>
+    <div className="space-y-2">
+      <div className="flex flex-col gap-0.5 px-1 text-xs">
+        <a href={LINKS.github} target="_blank" rel="noreferrer" className="flex items-center gap-2 rounded px-2 py-1.5 text-fg-muted hover:bg-surface-2 hover:text-fg">
+          <FolderGit2 className="size-3.5" /> Source on GitHub
+        </a>
+        <a href={LINKS.judgeQuickstart} target="_blank" rel="noreferrer" className="flex items-center gap-2 rounded px-2 py-1.5 text-fg-muted hover:bg-surface-2 hover:text-fg">
+          <BookOpen className="size-3.5" /> Docs & judge guide
+        </a>
       </div>
-      <div className="mt-1 text-fg-subtle">Base Sepolia · Lasna</div>
+      <div className="rounded-md border border-border px-3 py-2.5 text-xs text-fg-muted">
+        <div className="flex items-center justify-between">
+          <span>Protocol</span>
+          <span className={deploymentInfo ? "text-success" : "text-warning"}>{deploymentInfo ? "Deployed (testnet)" : "Not deployed"}</span>
+        </div>
+        <div className="mt-1 text-fg-subtle">Base Sepolia · Reactive Lasna</div>
+      </div>
     </div>
   );
 }

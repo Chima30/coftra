@@ -356,6 +356,7 @@ function Review({ rule }: { rule: RuleInput }) {
           ["Recipient", <Hex key="r" value={rule.recipient} chainId={destination.id} />],
           ...rule.milestones.map((m, i) => [`Verifier, checkpoint ${i + 1}`, <Hex key={i} value={m.verifier} chainId={destination.id} />] as [string, React.ReactNode]),
           ["Permitted targets", "None. Payouts go only to the recipient."],
+          ["Who can trigger a payout", "Automatically: only the named verifier, through Reactive Network. Manually: you, as owner override (skips the verifier, before the deadline, same fixed amount and recipient)."],
         ]
       : [
           ["Executor", <Hex key="e" value={rule.executor} chainId={destination.id} />],

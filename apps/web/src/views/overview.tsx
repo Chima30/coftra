@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useAccount } from "wagmi";
 import { useEffect, useState } from "react";
-import { ArrowRight, CircleCheck, Clock3, Flag, Radio, ShieldCheck } from "lucide-react";
+import { ArrowRight, BadgeCheck, CircleCheck, Clock3, Flag, Radio, ShieldCheck } from "lucide-react";
 import { PageHeader } from "@/components/app-shell";
 import { Card, CardHeader, Stat, Skeleton, buttonStyles } from "@/components/ui/primitives";
 import { TaskRow } from "@/components/task-bits";
@@ -32,6 +32,62 @@ const engines = [
   },
 ];
 
+const trySteps = [
+  {
+    title: "Get a testnet wallet",
+    body: "Any browser wallet on Base Sepolia (chain 84532), with a little test ETH from a Base Sepolia faucet for gas. Never use a wallet holding real funds.",
+  },
+  {
+    title: "Get test tokens",
+    body: "Connect, open Create Automation and press “Get 1,000 test tUSDC”. tUSDC is a test token with no value.",
+  },
+  {
+    title: "Create a task",
+    body: "Pick a template. For the quickest result, name yourself as verifier and pick the 15-minute deadline. Read the Safety preview, then approve the exact amount and create.",
+  },
+  {
+    title: "Watch it finish without you",
+    body: "Attest a checkpoint from the task page, or do nothing and let the deadline pass. Reactive Network triggers the payout or the refund, and it appears in Automation Activity.",
+  },
+];
+
+function HowToTry() {
+  return (
+    <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
+      <Card className="p-5">
+        <h2 className="text-[15px] font-semibold">Try it yourself in about 10 minutes</h2>
+        <ol className="mt-4 grid gap-4 sm:grid-cols-2">
+          {trySteps.map((s, i) => (
+            <li key={s.title} className="flex gap-3">
+              <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-accent-soft text-xs font-semibold text-accent">{i + 1}</span>
+              <div>
+                <div className="text-sm font-medium">{s.title}</div>
+                <p className="mt-0.5 text-[13px] leading-relaxed text-fg-muted">{s.body}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </Card>
+      <Card className="p-5 text-[13px] leading-relaxed text-fg-muted">
+        <h2 className="text-[15px] font-semibold text-fg">What Coftra controls</h2>
+        <ul className="mt-3 space-y-2">
+          <li>
+            <span className="font-medium text-fg">Only what you deposit.</span> The vault holds each task&apos;s funds separately. It never gets access to
+            your wallet.
+          </li>
+          <li>
+            <span className="font-medium text-fg">Only the rule you approved.</span> Payouts go to the recipient you set; leftovers go to your refund
+            address.
+          </li>
+          <li>
+            <span className="font-medium text-fg">Never stuck.</span> If automation is down, the deadline fallback can be run by anyone 30 minutes later.
+          </li>
+        </ul>
+      </Card>
+    </div>
+  );
+}
+
 function Intro() {
   return (
     <div className="space-y-6">
@@ -46,14 +102,16 @@ function Intro() {
           you can close the tab and come back to a finished task with a proof trail.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
-          <Link href="/create" className={buttonStyles({ size: "lg" })}>
-            Create an automation <ArrowRight className="size-4" />
+          <Link href="/proof" className={buttonStyles({ size: "lg" })}>
+            <BadgeCheck className="size-4" /> See 4 verified automations
           </Link>
-          <Link href="/activity" className={buttonStyles({ variant: "secondary", size: "lg" })}>
-            See execution proofs
+          <Link href="/create" className={buttonStyles({ variant: "secondary", size: "lg" })}>
+            Try it on testnet <ArrowRight className="size-4" />
           </Link>
         </div>
+        <p className="mt-3 text-xs text-fg-subtle">The verified demo needs no wallet. Every transaction opens on its block explorer.</p>
       </Card>
+      <HowToTry />
       <div className="grid gap-4 md:grid-cols-3">
         {engines.map(({ icon: Icon, name, body }) => (
           <Card key={name} className="p-5">
@@ -118,7 +176,12 @@ function Dashboard() {
             <EmptyState
               title="No tasks yet"
               body="Create a project budget or a spending session. You'll see it here, read straight from the vault."
-              action={<Link href="/create" className={buttonStyles()}>Create automation</Link>}
+              action={
+                <div className="flex flex-wrap justify-center gap-2">
+                  <Link href="/create" className={buttonStyles()}>Create automation</Link>
+                  <Link href="/proof" className={buttonStyles({ variant: "secondary" })}>See verified examples</Link>
+                </div>
+              }
             />
           ) : (
             tasks.slice(0, 5).map((t) => <TaskRow key={t.id.toString()} t={t} role={data?.owned.has(t.id.toString()) ? undefined : "Involved"} />)

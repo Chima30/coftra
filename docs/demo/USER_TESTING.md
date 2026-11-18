@@ -1,40 +1,54 @@
-# Real-world validation plan
+# Usability test guide (3–5 participants)
 
-There is no user feedback yet, and this document doesn't invent any. It describes how to collect real feedback and where to record it.
+**Status: not run yet. No feedback exists, and none should be quoted until sessions happen.**
 
-## Who to test with (5–8 people)
+## Who to recruit
 
-- 2–3 people who pay contributors in crypto: DAO operators, grant program leads, freelancers' clients.
-- 2–3 people who use bots or helpers for on-chain actions: NFT minters, airdrop farmers.
-- 1–2 people new to Web3 who hold a testnet wallet, to test clarity.
+| # | Profile | Why |
+|---|---|---|
+| 1–2 | Has paid a freelancer, contributor or grantee in crypto | Core project-budget use case |
+| 1 | Has used a bot or helper to mint, claim or buy | Spending-session use case |
+| 1–2 | Holds a wallet but has never written a contract | Tests whether the copy works without jargon |
 
-## Scenarios (testnet, about 20 minutes each)
+Use testnet wallets only. Tell participants that tUSDC has no value and that they can stop at any time.
 
-1. **Pay a freelancer in two stages.** Create a 100 tUSDC Conditional Project Budget with two checkpoints and a reserve. Act as the verifier for checkpoint 1. Close the tab, come back, and find the payout and its proof.
-2. **Let a bot mint for you.** Create a Temporary Spending Session for the demo NFT. Run the executor step from a second wallet. Confirm the NFT is in your wallet and the leftover came back.
-3. **Nothing happened in time.** Create a 5-minute task, do nothing, and explain in your own words what happened to the money.
+## Setup (5 min, before the session)
 
-## Checklist per session
+- The participant has a browser wallet on Base Sepolia with ~0.005 test ETH.
+- Open the live app on their device, and have a second address ready to act as the recipient or bot.
 
-- [ ] Could they explain CHECKPOINT, CLOSEOUT and FALLBACK after reading only the Safety Preview?
-- [ ] Did they understand what the verifier can and cannot do?
-- [ ] Did anything in the builder block them? Note the step and the wording.
-- [ ] Did they notice the funding-health status? Did it make sense?
-- [ ] After reconnecting, could they find their task and see what happened?
-- [ ] In the Proof Center, could they tell which transaction was on which chain?
-- [ ] Would they use this with real money? What would stop them?
-- [ ] One thing they'd remove, and one thing they missed.
+## Tasks (about 25 min). Read each one aloud and don't explain the UI.
 
-## Questions to ask (don't lead)
+1. **Understand.** Open the app and tell me what you think it does. Then open the verified demo: what happened in the first example?
+2. **Create a project budget.** Pay a friend 30 then 50 for two stages of work, with 20 kept back. Make yourself the verifier, with a 15-minute deadline. Stop on the review screen.
+   - Ask: *Who can take money out of this task? What happens to the 20? What happens if the deadline passes?*
+3. **Finish it.** Create the task, then mark the first stage as done. Close the tab, wait a minute, and come back.
+   - Ask: *What happened? How do you know?*
+4. **Owner override.** On the task page, find another way to pay stage 2. Stop at the confirmation box.
+   - Ask: *How is this different from what happened in step 3?*
+5. **Callback funds.** In Settings, find where to top up automation.
+   - Ask: *If you send 0.001 ETH here, can you get it back?*
 
-- "What do you expect happens to the remaining 20 tUSDC?" Ask before they see it happen.
-- "Who could take money out of this task right now?"
-- "If this website went offline tomorrow, what happens to your task?"
+## What to record
 
-## Recording results
+For each task, record:
+- completed / needed a hint / gave up
+- time taken
+- any wrong belief the participant stated (verbatim)
 
-Add one row per participant to the table below, using anonymised ids, with their consent. Quote them verbatim, and don't summarise feedback that wasn't given.
+Key comprehension checks:
+- [ ] Knew the vault only controls what they deposited
+- [ ] Could say who is allowed to trigger a payout
+- [ ] Understood the reserve returns to them
+- [ ] Understood what the deadline does
+- [ ] Understood the owner override skips the verifier
+- [ ] Understood callback funds are not withdrawable
+- [ ] Knew what to do if automation didn't run
 
-| Participant | Date | Scenario | Completed? | Key quote | Issue filed |
+## Results table
+
+Fill this in only from real sessions, with participant consent and anonymised ids.
+
+| Participant | Date | Profile | Tasks completed | Wrong beliefs observed | Changes made |
 |---|---|---|---|---|---|
 | — | — | — | — | — | — |

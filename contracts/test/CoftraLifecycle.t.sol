@@ -567,6 +567,51 @@ contract CoftraLifecycleTest is CoftraFixture {
         assertEq(sys.activeSubscriptionCount(address(rc)), 6);
     }
 
+    /// Callbacks that arrive after a task is final (delayed, duplicated or replayed) must not move funds,
+    /// reopen the task or revert: each one is recorded with a reason and nothing else changes.
+    function test_lateCallbacksAfterCloseChangeNothing() public {
+        // Project completed through both checkpoints.
+        uint256 p = _project(100e6, 30e6, 50e6, 1 days);
+        _attest(verifier, p, 0);
+        _attest(verifier2, p, 1);
+        assertEq(uint8(_state(p)), uint8(ICoftraVault.TaskState.Completed));
+
+        // Session completed by its paid-for mint.
+        uint256 s = _session(100e6, 60e6, 1 days);
+        vm.prank(executor);
+        vault.executeSession(s, 25e6, abi.encodeCall(CoftraDemoNFT.mint, (owner)));
+        _pump();
+        assertEq(uint8(_state(s)), uint8(ICoftraVault.TaskState.Completed));
+
+        uint256 vaultBal = usdc.balanceOf(address(vault));
+        uint256 recipientBal = usdc.balanceOf(recipient);
+        uint256 ownerBal = usdc.balanceOf(owner);
+
+        _callbackAsNetwork(
+            abi.encodeCall(vault.onMilestoneVerified, (address(0), block.chainid, 101, p, 0, verifier, 1)),
+            ICoftraVault.CallbackResult.AlreadyApplied
+        );
+        _callbackAsNetwork(
+            abi.encodeCall(vault.onOutcome, (address(0), block.chainid, 102, address(nft), owner, 1)),
+            ICoftraVault.CallbackResult.NoSessionForOutcome
+        );
+        vm.warp(block.timestamp + 2 days);
+        uint256[] memory ids = new uint256[](2);
+        ids[0] = p;
+        ids[1] = s;
+        _callbackAsNetwork(
+            abi.encodeCall(vault.onExpiryCheck, (address(0), block.chainid, 103, ids)),
+            ICoftraVault.CallbackResult.AlreadyApplied
+        );
+
+        assertEq(usdc.balanceOf(address(vault)), vaultBal, "vault balance unchanged");
+        assertEq(usdc.balanceOf(recipient), recipientBal, "no extra payout");
+        assertEq(usdc.balanceOf(owner), ownerBal, "no extra refund");
+        assertEq(uint8(_state(p)), uint8(ICoftraVault.TaskState.Completed), "project stays Completed");
+        assertEq(uint8(_state(s)), uint8(ICoftraVault.TaskState.Completed), "session stays Completed");
+        assertFalse(vault.getSession(s).executorActive, "executor stays revoked");
+    }
+
     // ================================================================ helpers
 
     function _trackedOf(uint256 id) internal view returns (uint64, uint64, uint32) {

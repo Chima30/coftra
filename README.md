@@ -4,7 +4,11 @@ Most on-chain tasks don't end when the transaction is sent. Someone still has to
 
 You fund a task, set its rules, and close the tab. [Reactive Network](https://dev.reactive.network/) watches for the events that matter, and a self-custodial vault applies the outcome: it releases a milestone, closes a spending session, or returns what's left when the deadline passes. Every step leaves a proof trail you can open on a block explorer.
 
-> **Status:** testnet only (Base Sepolia + Reactive Lasna). Contracts are deployed, and CHECKPOINT, CLOSEOUT and FALLBACK are each proven end to end on testnet. See [docs/IMPLEMENTATION_STATUS.md](docs/IMPLEMENTATION_STATUS.md). Not audited. Don't use it with real funds.
+**Live app:** https://web-two-pied-ft7sms1616.vercel.app/ · **Verified demo, no wallet needed:** [/proof](https://web-two-pied-ft7sms1616.vercel.app/proof) · **Judges:** [5-minute quickstart](docs/JUDGE_QUICKSTART.md)
+
+> **Status:** testnet only (Base Sepolia + Reactive Lasna). Contracts are deployed, and CHECKPOINT, CLOSEOUT and FALLBACK are each proven end to end on testnet, each loop taking about 1–3 s from origin to callback. See [docs/IMPLEMENTATION_STATUS.md](docs/IMPLEMENTATION_STATUS.md). Not audited. Don't use it with real funds.
+>
+> More: [failure & recovery evidence](docs/FAILURE_RECOVERY.md) · [how Coftra differs](docs/DIFFERENTIATION.md) · [security review](docs/security/SECURITY_REVIEW.md)
 
 ## Who it helps
 

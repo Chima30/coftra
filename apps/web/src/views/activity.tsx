@@ -3,7 +3,6 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import { ShieldCheck } from "lucide-react";
-import { PageHeader } from "@/components/app-shell";
 import { ResultBadge, useActivity, type ActivityItem } from "@/components/activity-feed";
 import { ProofView } from "@/components/proof-view";
 import { EmptyState, ErrorState, NotDeployed } from "@/components/states";
@@ -34,10 +33,6 @@ export function ActivityView() {
 
   return (
     <>
-      <PageHeader
-        title="Automation Activity"
-        description="The Proof Center. Every automated step, traced from the origin event through Reactive Network to the vault, rebuilt from chain data when you open it."
-      />
       {!deploymentInfo ? (
         <NotDeployed />
       ) : error ? (

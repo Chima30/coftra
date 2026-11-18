@@ -13,10 +13,10 @@ const templates = [
     example:
       "100 tUSDC for a design job. Checkpoint 1 pays 30 after the reviewer attests the drafts; checkpoint 2 pays 50 after final files. 20 is a reserve that always comes back. If the deadline passes before checkpoint 2, the 30 already paid stands and the remaining 70 returns.",
     enforces: [
-      "Only the named verifier can trigger each payout, and only once",
+      "Only the named verifier can trigger an automatic payout, and each checkpoint pays only once",
       "Payouts only go to the recipient set at creation",
       "No payout after the deadline; no way to reopen a closed task",
-      "The owner can't pull the budget back mid-task, but can always release a checkpoint early",
+      "The owner can't pull the budget back mid-task. The owner can pay a checkpoint early as a manual override: it skips the verifier, is not a Reactive callback, and can only pay the fixed recipient",
     ],
   },
   {

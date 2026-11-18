@@ -45,6 +45,12 @@ Checked on-chain after deployment:
 
 Issue found and fixed during live testing: `sepolia.base.org` limits `eth_getLogs` to 200 blocks (HTTP 413), and Lasna caps it at 30,000. The app now defaults to `base-sepolia-rpc.publicnode.com` and reads Lasna in 25,000-block chunks.
 
+## Live deployment
+
+- App: https://web-two-pied-ft7sms1616.vercel.app/ (Vercel, root directory `apps/web`)
+- Verified demo with no wallet needed: https://web-two-pied-ft7sms1616.vercel.app/proof
+- Judge guide: [JUDGE_QUICKSTART.md](JUDGE_QUICKSTART.md)
+
 ## Official submission checklist
 
 Source: https://dorahacks.io/hackathon/reactive-omni-buildathon/detail and the /tracks page, read 2026-11-17.
@@ -55,7 +61,7 @@ Source: https://dorahacks.io/hackathon/reactive-omni-buildathon/detail and the /
 
 | Requirement | Status |
 |---|---|
-| Link to a public, open-source repository | ❌ Not published; nothing committed yet |
+| Link to a public, open-source repository | ✅ https://github.com/Chima30/coftra (CI green on first push) |
 | Deployed contract addresses | ✅ See Deployment above |
 | A few transaction hashes showing origin event → callback | ✅ Four full loops, see Verified evidence |
 | Demo video under three minutes | ❌ Not recorded (outline in `docs/demo/DEMO.md`) |
@@ -116,9 +122,9 @@ Each row was checked three ways: the receipts on both chains (`cast`), the React
 | Workflow | Origin tx | Reactive tx (Lasna) | Destination tx (Base Sepolia) | Verified outcome |
 |---|---|---|---|---|
 | CHECKPOINT (task 1) | `0xd14aab0c1ba0d840139b1b6e0d97491e464581b0c3435ff5995876037f4560ce` (Base Sepolia, `attest(1, 0, 1)`) | `0xf584e835f25d1fd4e5d3d24c44ef8169248fd2245d676eff0427e94c1d13682c` | `0x6c2d47492b3a67cfae829059840563e11816097fc562b3c14374a36109b42868` | Result Applied. 30 tUSDC vault → recipient `0x1aB0…5280`; `MilestoneReleased(1, 0)`; checkpoint 1 can't be attested again |
-| CLOSEOUT (task 3, spending session) | `0x0cb519ee7ed7a9894a790ce0a8c2cd34ac8e6fc6f738ba13d453173e0503f99f` (Base Sepolia, bot `executeSession` → `CoftraDemoNFT` mint `Transfer(0, owner, 1)`) | `0x1c03e0d5b22b94df6008bd788f3988b71c84f4ff156418e3702304030c8deba4` | `0xd26d202b13f207173a73fff75a96c149370c5e12c89dee186add4eeb24b9c5fa` | Result Applied, 8 blocks after the mint. Task 3 Completed; executor `0x84BF…e264` revoked; spent exactly 25 of the 25 cap; NFT #1 owned by the owner; 15 tUSDC unspent returned; outcome slot cleared. A second `executeSession` by the bot reverts with `WrongState(3)` (read-only `eth_call`) |
+| CLOSEOUT (task 3, spending session) | `0x0cb519ee7ed7a9894a790ce0a8c2cd34ac8e6fc6f738ba13d453173e0503f99f` (Base Sepolia, bot `executeSession` → `CoftraDemoNFT` mint `Transfer(0, owner, 1)`) | `0x1c03e0d5b22b94df6008bd788f3988b71c84f4ff156418e3702304030c8deba4` | `0xd26d202b13f207173a73fff75a96c149370c5e12c89dee186add4eeb24b9c5fa` | Result Applied about 2 s after the mint (8 Base Sepolia blocks at 200 ms). Task 3 Completed; executor `0x84BF…e264` revoked; spent exactly 25 of the 25 cap; NFT #1 owned by the owner; 15 tUSDC unspent returned; outcome slot cleared. A second `executeSession` by the bot reverts with `WrongState(3)` (read-only `eth_call`) |
 | CLOSEOUT (task 1, project budget completes) | `0x4330a5abe5a213614a0213510f666475028cbce361e499a3013ef53aed7d4846` (Base Sepolia, `attest(1, 1, 1)`, last checkpoint) | `0xae198bcdaae3c6b8e992f5607413cf0adb83a17081557987a84a6e7153552311` | `0xe917b2f438bdf9ebac2bf2a63cb85df473093a1fabe0d0c8a1217c29a28bc9ed` | Result Applied. 50 tUSDC to the recipient (80 in total); task 1 Completed; the 20 tUSDC reserve returned to the owner; the RC untracked the task and unsubscribed from cron (no open tasks) |
-| FALLBACK (task 2) | `0x612b3e7c48e85f5ea33681fce1c6e8afb6555290929733a1423b909208a2b5e6` (Lasna Cron tick from `0x…fffFfF`) | `0x5c48cda6f98fd703c6b0562dca07def027df9be65f035826c70f8e59cb25fb49` | `0x00f052cdfd2f5f5e6eab4338610b1bef9702ef8ef8f833b57d85467761a0bf21` | Result Applied. Task 2 Expired about 90 s after its deadline with nobody online; 20 tUSDC returned to the owner; the RC saw `TaskClosed` and stopped tracking task 2 |
+| FALLBACK (task 2) | `0x612b3e7c48e85f5ea33681fce1c6e8afb6555290929733a1423b909208a2b5e6` (Lasna Cron tick from `0x…fffFfF`) | `0x5c48cda6f98fd703c6b0562dca07def027df9be65f035826c70f8e59cb25fb49` | `0x00f052cdfd2f5f5e6eab4338610b1bef9702ef8ef8f833b57d85467761a0bf21` | Result Applied. Task 2 Expired 77 s after its deadline (the next Cron100 tick) with nobody online; 20 tUSDC returned to the owner; the RC saw `TaskClosed` and stopped tracking task 2 |
 
 Demo B setup (Base Sepolia, `script/DemoB.s.sol`, signed by the owner): exact 40 tUSDC approve `0xfd3ffb3cebaca5c79af6478b70941e0852616ad8d0896aebc68d3780e7d197f9`, create session `0x90bd30285fc73e670e30ecb53f6830a3113cda6bbbc40651ec9ae5ee96b31271`. The owner's balance went from 860 to 900 tUSDC: +15 refund, and +25 because the deployer is also the demo NFT's treasury.
 

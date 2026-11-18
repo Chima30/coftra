@@ -39,7 +39,8 @@ export function ruleSentences(r: RuleInput): string[] {
     out.push(
       `If the deadline (${fmtDate(r.deadline)}) passes first, completed payouts stay valid, further releases are frozen, and the unspent balance returns to ${shortHex(r.refundTo)}.`,
     );
-    out.push(`Once active, you cannot cancel this budget before the deadline: it is a commitment to the recipient. You can always release a checkpoint yourself or extend the deadline.`);
+    out.push(`Once active, you cannot cancel this budget before the deadline: it is a commitment to the recipient. You can extend the deadline (verifiers then re-attest against the new version).`);
+    out.push(`Owner override: before the deadline you can also pay a checkpoint yourself without the verifier. This skips verification entirely and is not a Reactive automation. It can only pay that checkpoint's fixed amount to ${shortHex(r.recipient)}, once.`);
   } else {
     out.push(`You are funding a spending session with ${fmtToken(r.amount)}.`);
     out.push(

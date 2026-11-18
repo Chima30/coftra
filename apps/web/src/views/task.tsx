@@ -17,7 +17,7 @@ import { useTx } from "@/hooks/use-tx";
 import { useNow } from "@/hooks/use-now";
 import { demoNftAbi, registryAbi, vaultAbi } from "@/lib/contracts";
 import { destination } from "@/lib/chains";
-import { fmtDate, fmtToken, relTime, uintToHash } from "@/lib/format";
+import { fmtDate, fmtToken, relTime, shortHex, uintToHash } from "@/lib/format";
 import { isTerminal, kindLabel, stateCopy, TaskKind, TaskState, callbackKindLabel, callbackResultCopy, CallbackResult } from "@/lib/protocol";
 import { ruleSentences } from "@/lib/summary";
 import type { TaskView as T, VaultLog } from "@/lib/reads";
@@ -167,19 +167,46 @@ function Milestones({ t, verifierOf, isOwner }: { t: T; verifierOf: number[]; is
   });
   const active = t.task.state === TaskState.Active;
   const nowTs = useNow();
+  const [confirmIdx, setConfirmIdx] = useState<number | null>(null);
+  const logs = useVaultLogs();
+  // How each paid checkpoint was released, straight from MilestoneReleased(viaReactive).
+  const paidVia = useMemo(() => {
+    const m = new Map<number, boolean>();
+    for (const l of logs.data ?? []) {
+      if (l.eventName !== "MilestoneReleased") continue;
+      const a = l.args as { taskId: bigint; milestoneIndex: bigint; viaReactive: boolean };
+      if (a.taskId === t.id) m.set(Number(a.milestoneIndex), a.viaReactive);
+    }
+    return m;
+  }, [logs.data, t.id]);
   return (
     <Card>
-      <CardHeader title="Checkpoints" description="CHECKPOINT engine: released by Reactive Network after the named verifier attests." />
+      <CardHeader
+        title="Checkpoints"
+        description="CHECKPOINT engine: paid automatically by a Reactive callback after the named verifier attests. The owner can also override (see below)."
+      />
       <ul className="divide-y divide-border">
         {t.milestones.map((m, i) => {
           const vi = verifierOf.indexOf(i);
           const canAttest = vi >= 0 && (can.data?.[vi]?.result as boolean | undefined);
           return (
-            <li key={i} className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <li key={i} className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
                   <span className="font-medium">Checkpoint {i + 1}</span>
-                  {m.done ? <Badge tone="success">Released</Badge> : active ? <Badge tone="info">Waiting for verifier</Badge> : <Badge>Not released</Badge>}
+                  {m.done ? (
+                    paidVia.get(i) === false ? (
+                      <Badge tone="warning">Paid by owner override</Badge>
+                    ) : paidVia.get(i) === true ? (
+                      <Badge tone="success">Verified · paid via Reactive</Badge>
+                    ) : (
+                      <Badge tone="success">Released</Badge>
+                    )
+                  ) : active ? (
+                    <Badge tone="info">Waiting for verifier</Badge>
+                  ) : (
+                    <Badge>Not released</Badge>
+                  )}
                 </div>
                 <div className="mt-1 flex flex-wrap items-center gap-x-2 text-sm text-fg-muted">
                   <span className="tabular">{fmtToken(m.amount)}</span> · verifier <Hex value={m.verifier} chainId={destination.id} />
@@ -202,24 +229,45 @@ function Milestones({ t, verifierOf, isOwner }: { t: T; verifierOf: number[]; is
                     Attest completion
                   </Button>
                 )}
-                {isOwner && active && !m.done && Number(t.task.deadline) > nowTs && (
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    disabled={release.busy}
-                    onClick={() =>
-                      release.run(`Release checkpoint ${i + 1}`, {
-                        address: d.vault,
-                        abi: vaultAbi,
-                        functionName: "ownerReleaseMilestone",
-                        args: [t.id, BigInt(i)],
-                      })
-                    }
-                  >
-                    Release manually
+                {isOwner && active && !m.done && Number(t.task.deadline) > nowTs && confirmIdx !== i && (
+                  <Button size="sm" variant="secondary" disabled={release.busy} onClick={() => setConfirmIdx(i)}>
+                    Owner override…
                   </Button>
                 )}
               </div>
+              {confirmIdx === i && (
+                <div className="w-full rounded-md border border-warning/40 bg-warning-soft p-3 text-[13px] sm:basis-full" role="alertdialog" aria-label="Confirm owner override">
+                  <div className="font-medium text-warning">Pay checkpoint {i + 1} without the verifier?</div>
+                  <ul className="mt-1.5 list-disc space-y-0.5 pl-5 text-fg-muted">
+                    <li>
+                      Sends {fmtToken(m.amount)} to the recipient now, from your task deposit. No attestation from {shortHex(m.verifier)} is needed or
+                      recorded.
+                    </li>
+                    <li>This is a normal transaction you sign, not a Reactive automation, so it won&apos;t appear in the Proof Center.</li>
+                    <li>It can&apos;t be undone, and the checkpoint can never be paid again. It can only go to the recipient set at creation.</li>
+                  </ul>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <Button
+                      size="sm"
+                      disabled={release.busy}
+                      onClick={async () => {
+                        await release.run(`Owner override: pay checkpoint ${i + 1}`, {
+                          address: d.vault,
+                          abi: vaultAbi,
+                          functionName: "ownerReleaseMilestone",
+                          args: [t.id, BigInt(i)],
+                        });
+                        setConfirmIdx(null);
+                      }}
+                    >
+                      Pay without verifier
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={() => setConfirmIdx(null)}>
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              )}
             </li>
           );
         })}
@@ -228,11 +276,14 @@ function Milestones({ t, verifierOf, isOwner }: { t: T; verifierOf: number[]; is
         <TxStatusLine status={attest.status} hash={attest.hash} error={attest.error} />
         {attest.status === "confirmed" && (
           <p className="text-sm text-fg-muted">
-            Attestation recorded. Reactive Network now relays it to the vault; the payout appears here once the callback lands (usually within a
-            minute or two).
+            Attestation recorded. Reactive Network now relays it to the vault. In our recorded runs the callback landed within about 3 seconds;
+            this page refreshes every 10 seconds. If nothing arrives, check Funding Health in Settings.
           </p>
         )}
         <TxStatusLine status={release.status} hash={release.hash} error={release.error} />
+        {release.status === "confirmed" && (
+          <p className="text-sm text-fg-muted">Paid by owner override. This was your own transaction, not a Reactive callback.</p>
+        )}
       </div>
     </Card>
   );
@@ -427,7 +478,7 @@ function TimelineRow({ l }: { l: VaultLog }) {
   const ts = useBlockTime("dest", l.blockNumber);
   const a = l.args as Record<string, unknown>;
   let extra: string | null = null;
-  if (l.eventName === "MilestoneReleased") extra = `#${Number(a.milestoneIndex) + 1} · ${fmtToken(a.amount as bigint)}${a.viaReactive ? " · via Reactive" : " · by owner"}`;
+  if (l.eventName === "MilestoneReleased") extra = `#${Number(a.milestoneIndex) + 1} · ${fmtToken(a.amount as bigint)}${a.viaReactive ? " · verified, paid by Reactive callback" : " · owner override (no verifier, not a Reactive callback)"}`;
   if (l.eventName === "SessionExecuted") extra = fmtToken(a.spent as bigint);
   if (l.eventName === "Settled") extra = `released ${fmtToken(a.released as bigint)}, returned ${fmtToken(a.refunded as bigint)}`;
   if (l.eventName === "TaskClosed") extra = stateCopy[Number(a.finalState) as TaskState].label;
