@@ -60,7 +60,7 @@ Issue found and fixed during live testing: `sepolia.base.org` limits `eth_getLog
 | Source verification on explorers | ⏳ Commands prepared; awaiting the owner's approval |
 | Real-wallet website test | ⏳ Not run; step-by-step plan in `docs/demo/WALLET_TEST.md` |
 | User testing | ❌ Not run; guide in `docs/demo/USER_TESTING.md` |
-| Reactive reserve | 2.0578 lREACT, no debt, cron off (read 2026-11-18). Covers ≈4.4 h of open-task automation at the measured rate (≈11.3 lREACT per day): **top up before judging** |
+| Reactive reserve | 3.2578 lREACT, no debt, cron off, after a 1.2 lREACT top-up (Lasna tx `0x92f3aa5261b752ba0c7075d5d983c04f56c8a4a04f2623ace2f790664803918e`, 2026-11-18). Covers ≈6.9 h of open-task automation at the measured rate (≈11.3 lREACT per day). A larger top-up is still recommended before judging |
 | Frontend fixes | Cancelled or replaced transactions no longer shown as confirmed; writes pinned to Base Sepolia; slow-transaction hint; runway warnings; shareable `/proof/<id>` pages |
 
 ## Official submission checklist
