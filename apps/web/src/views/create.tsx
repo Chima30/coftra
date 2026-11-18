@@ -48,6 +48,7 @@ export function CreateView() {
 }
 
 function Builder() {
+  const { assessment: fundingAssessment } = useFundingAssessment();
   const d = deploymentInfo!;
   const { address } = useAccount();
   const params = useSearchParams();
@@ -311,9 +312,9 @@ function Builder() {
               <div className="flex flex-wrap gap-2">
                 {[
                   ["15 min (demo)", 15 * 60],
+                  ["1 hour", 3600],
+                  ["4 hours", 4 * 3600],
                   ["1 day", 86400],
-                  ["7 days", 7 * 86400],
-                  ["30 days", 30 * 86400],
                 ].map(([l, s]) => (
                   <Button key={l as string} variant="secondary" size="sm" onClick={() => setDeadline(toLocalInput(Math.floor(Date.now() / 1000) + (s as number)))}>
                     {l}
@@ -323,6 +324,14 @@ function Builder() {
               <Field label="Fallback: return unspent funds to" htmlFor="refund" hint="Used on completion, expiry and cancellation. Completed payouts are never clawed back." error={show("refundTo")}>
                 <Input id="refund" value={refundTo} onChange={(e) => setRefundTo(e.target.value)} spellCheck={false} />
               </Field>
+              {fundingAssessment && (deadlineTs - nowTs) / 3600 > fundingAssessment.runwayHoursWhileOpen && (
+                <Notice tone="warning" title="This deadline outlasts the current automation reserve">
+                  While any task is open, the reactive contract pays for a deadline check about every 2 minutes. At the measured testnet rate, its
+                  reserve covers about {fundingAssessment.runwayHoursWhileOpen.toFixed(1)} hours of that. If it runs out before your deadline, automation
+                  pauses for every task until someone tops it up. Your funds stay safe, and the manual fallback still works 30 minutes after the deadline.
+                  Shorter deadlines are more reliable on this testnet deployment.
+                </Notice>
+              )}
               <Notice tone="neutral" title="Supported fallback">
                 On expiry, the vault freezes further payouts, revokes any executor and returns the unspent balance to the address above. If automation is
                 ever unavailable, anyone can run the same fallback by hand 30 minutes after the deadline.
@@ -522,7 +531,7 @@ function FundAndActivate({ rule }: { rule: RuleInput }) {
             </div>
           )}
         </div>
-        <TxStatusLine status={faucet.status} hash={faucet.hash} error={faucet.error} />
+        <TxStatusLine status={faucet.status} hash={faucet.hash} error={faucet.error} slow={faucet.slow} />
 
         <div className="space-y-2">
           <div className="flex items-center justify-between gap-3">
@@ -541,7 +550,7 @@ function FundAndActivate({ rule }: { rule: RuleInput }) {
               </Button>
             )}
           </div>
-          <TxStatusLine status={approve.status} hash={approve.hash} error={approve.error} />
+          <TxStatusLine status={approve.status} hash={approve.hash} error={approve.error} slow={approve.slow} />
         </div>
 
         <div className="space-y-2">
@@ -557,7 +566,7 @@ function FundAndActivate({ rule }: { rule: RuleInput }) {
               {activateNow ? "Create & activate" : "Create"}
             </Button>
           </div>
-          <TxStatusLine status={create.status} hash={create.hash} error={create.error} />
+          <TxStatusLine status={create.status} hash={create.hash} error={create.error} slow={create.slow} />
         </div>
         {rule.kind === TaskKind.SpendingSession && (
           <p className="text-xs text-fg-subtle">

@@ -273,14 +273,14 @@ function Milestones({ t, verifierOf, isOwner }: { t: T; verifierOf: number[]; is
         })}
       </ul>
       <div className="space-y-2 border-t border-border px-5 py-3">
-        <TxStatusLine status={attest.status} hash={attest.hash} error={attest.error} />
+        <TxStatusLine status={attest.status} hash={attest.hash} error={attest.error} slow={attest.slow} />
         {attest.status === "confirmed" && (
           <p className="text-sm text-fg-muted">
             Attestation recorded. Reactive Network now relays it to the vault. In our recorded runs the callback landed within about 3 seconds;
             this page refreshes every 10 seconds. If nothing arrives, check Funding Health in Settings.
           </p>
         )}
-        <TxStatusLine status={release.status} hash={release.hash} error={release.error} />
+        <TxStatusLine status={release.status} hash={release.hash} error={release.error} slow={release.slow} />
         {release.status === "confirmed" && (
           <p className="text-sm text-fg-muted">Paid by owner override. This was your own transaction, not a Reactive callback.</p>
         )}
@@ -333,7 +333,7 @@ function SessionPanel({ t, isExecutor }: { t: T; isExecutor: boolean }) {
           ) : (
             <p className="text-sm text-fg-muted">Your spending authority for this session has ended.</p>
           )}
-          <TxStatusLine status={exec.status} hash={exec.hash} error={exec.error} />
+          <TxStatusLine status={exec.status} hash={exec.hash} error={exec.error} slow={exec.slow} />
           {exec.status === "confirmed" && (
             <p className="text-sm text-fg-muted">Mint done. Reactive Network will observe it and close the session; refresh in a minute to see the closeout.</p>
           )}
@@ -427,7 +427,7 @@ function Actions({ t, isOwner }: { t: T; isOwner: boolean }) {
         )}
         {isTerminal(state) && <p className="text-fg-muted">This task is final. Nothing can reopen it or move its funds again.</p>}
         {!isOwner && !isTerminal(state) && state !== TaskState.Active && <p className="text-fg-muted">Only the owner can act on this task.</p>}
-        <TxStatusLine status={tx.status} hash={tx.hash} error={tx.error} />
+        <TxStatusLine status={tx.status} hash={tx.hash} error={tx.error} slow={tx.slow} />
       </div>
     </Card>
   );

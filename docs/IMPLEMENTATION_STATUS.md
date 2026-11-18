@@ -51,6 +51,18 @@ Issue found and fixed during live testing: `sepolia.base.org` limits `eth_getLog
 - Verified demo with no wallet needed: https://web-two-pied-ft7sms1616.vercel.app/proof
 - Judge guide: [JUDGE_QUICKSTART.md](JUDGE_QUICKSTART.md)
 
+## Final audit (2026-11-18)
+
+| Check | Result |
+|---|---|
+| Four recorded loops re-verified from raw receipts and current state | ✅ 58/58 checks (`cd apps/web && pnpm verify:proofs`) |
+| Deployed bytecode vs current source | ✅ All 5 contracts identical apart from immutables (`docs/deployment/VERIFY_SOURCE.md`) |
+| Source verification on explorers | ⏳ Commands prepared; awaiting the owner's approval |
+| Real-wallet website test | ⏳ Not run; step-by-step plan in `docs/demo/WALLET_TEST.md` |
+| User testing | ❌ Not run; guide in `docs/demo/USER_TESTING.md` |
+| Reactive reserve | 2.0578 lREACT, no debt, cron off (read 2026-11-18). Covers ≈4.4 h of open-task automation at the measured rate (≈11.3 lREACT per day): **top up before judging** |
+| Frontend fixes | Cancelled or replaced transactions no longer shown as confirmed; writes pinned to Base Sepolia; slow-transaction hint; runway warnings; shareable `/proof/<id>` pages |
+
 ## Official submission checklist
 
 Source: https://dorahacks.io/hackathon/reactive-omni-buildathon/detail and the /tracks page, read 2026-11-17.
@@ -136,7 +148,7 @@ Observed costs (from receipts): CHECKPOINT callback 161,866 gas (≈0.00000097 E
 - Moved the balance into reserves (Lasna, `script/Deploy.s.sol:Step5_BalanceToReserves`): `rc.withdraw` `0xc0bc5c850c27930bc12037f6fec018387e5bee795699abdd187ae65566eb3251`, `SYSTEM.depositTo` `0xc79576803a1a4bcb224156723c401e6bfdf46a22ea2e46222f0eb1c628d2c409`. Reserves afterwards: 2.058 lREACT, debt 0.
 - Funding Health now counts only reserves as runway and shows the contract balance as "not billed".
 - Deploy defaults now fund reserves (`RC_RESERVE_WEI`, 2 lREACT) instead of the constructor balance (`RC_FUNDING_WEI`, 0).
-- Operating note: Cron100 costs about 0.004 lREACT per minute while any task is open. Use `DEMO_FAST_CRON=false` (Cron1000) outside demos.
+- Operating note (measured 2026-11-18 from archive reserves): while any task is open, the deployment spends about 0.0079 lREACT per minute (≈11.3 per day), mostly Cron100 ticks. A 2.06 lREACT reserve covers about 4.4 hours of open-task time. Use `DEMO_FAST_CRON=false` (Cron1000) outside demos.
 
 Issue found and fixed during this run: Lasna receipts for reactive transactions have `effectiveGasPrice: null` (fees are billed to reserves), which crashed the proof cost line. The Proof Center now shows react() gas used instead.
 

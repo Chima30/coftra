@@ -120,9 +120,14 @@ export function ScenarioCard({ s }: { s: Scenario }) {
             </ul>
           </div>
           {s.caveat && <p className="mt-2 text-xs text-fg-subtle">Note: {s.caveat}</p>}
-          <Link href={`/tasks/${s.taskId}`} className="mt-3 inline-flex items-center gap-1 text-sm text-accent hover:underline">
-            Open task #{s.taskId} with its live history <ArrowRight className="size-3.5" />
-          </Link>
+          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm">
+            <Link href={`/tasks/${s.taskId}`} className="inline-flex items-center gap-1 text-accent hover:underline">
+              Open task #{s.taskId} with its live history <ArrowRight className="size-3.5" />
+            </Link>
+            <Link href={`/proof/${s.id}`} className="text-fg-muted hover:text-fg hover:underline">
+              Shareable link
+            </Link>
+          </div>
         </div>
       </div>
     </Card>

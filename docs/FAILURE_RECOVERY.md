@@ -27,8 +27,16 @@ cd contracts && forge test
 | Expiry requested before the deadline (clock skew) | Vault refuses (`NotYetDue`) | `test_fallback_vaultIgnoresEarlyExpiryRequest` | Local test |
 | Automation unavailable entirely | Anyone can call `expire` 30 min after the deadline | `test_fallback_manualRecoveryWhenAutomationIsDown` | Local test |
 | Recipient's token transfer fails | Transition completes; amount kept as claimable credit; claimable once | `test_failedPayoutIsCreditedAndClaimableOnce` | Local test |
-| Reactive execution reserve running low | Reactions billed from reserves; contract balance is not billed | Reserves fell 0.5 → 0.134 lREACT while cron ran; topped up with `Step5_BalanceToReserves` | On-chain |
-| Insufficient callback funding on Base | Proxy debt blocks callbacks; funds stay in the vault; manual paths still work | Not exercised on-chain. Funding Health shows proxy debt; manual `expire` and owner override need no callback | Not demonstrated |
+| Reactive execution reserve running low | Reactions billed from reserves; contract balance is not billed | Reserves fell 0.5 → 0.085 lREACT in 52.9 min (measured from archive state) while cron ran; topped up with `Step5_BalanceToReserves` | On-chain |
+| Insufficient callback funding on Base | Proxy debt blocks callbacks; funds stay in the vault; manual paths still work | Not exercised on-chain. Funding Health shows proxy debt; manual `expire` and owner override need no callback | Not tested |
+| Callback delayed beyond the deadline | Late milestone callbacks rejected (`PastDeadline`); the task then expires once | `test_fallback_completionAndExpiryRaceResolvesOnce` | Local test |
+| Attestation after the task expired | Registry refuses (`NotAttestable`); a forced callback is recorded `InvalidState` | `test_fallback_cronExpiresOverdueTaskAndPreservesPaidMilestones` | Local test |
+| Claiming a credit twice | Second claim reverts `NothingToClaim` | `test_failedPayoutIsCreditedAndClaimableOnce` | Local test |
+| Every one of the four recorded loops | Origin, Reactive request, proxy delivery, origin link in the callback, token movements and final state | `cd apps/web && pnpm verify:proofs` (58 checks against live receipts and state) | On-chain (read-only re-verification) |
+| Wallet cancels or replaces a pending transaction | The app reports it as cancelled or replaced, never "Confirmed" | `onReplaced` handling in `apps/web/src/hooks/use-tx.ts` | Code review; manual browser test pending (WALLET_TEST X2) |
+| Wallet on the wrong network | Write actions refuse with "switch to Base Sepolia"; nothing sent to another chain | `chainId` pinned on every write in `use-tx.ts` | Code review; manual browser test pending (WALLET_TEST A5) |
+| Browser closed during a transaction | State rebuilt from the chain on reopen; recent hashes reconciled with receipts | Settings → "Transactions sent from this browser" | Manual browser test pending (WALLET_TEST X3) |
+| RPC outage while loading | Funding shows "Unknown"; proofs show "couldn't re-check"; nothing shown as healthy or verified | `funding.tsx`, `verified.tsx` | Code review; not fault-injected |
 
 ## Safe recovery of unspent funds
 

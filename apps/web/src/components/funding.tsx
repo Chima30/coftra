@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Fuel } from "lucide-react";
 import { useFunding } from "@/hooks/use-coftra";
-import { assessFunding, ASSUMPTIONS, type HealthLevel } from "@/lib/funding";
+import { assessFunding, ASSUMPTIONS, OBSERVED_LREACT_PER_MIN_WHILE_OPEN, type HealthLevel } from "@/lib/funding";
 import { fmtNative } from "@/lib/format";
 import { callbackResultCopy, CallbackResult } from "@/lib/protocol";
 import { useActivity } from "./activity-feed";
@@ -39,6 +39,9 @@ export function FundingSummary() {
           <>
             <Row label="Reactive execution (Lasna)" level={assessment.reactive} value={`${fmtNative(assessment.rcSpendable, "lREACT", 3)} in reserves`} />
             <Row label="Destination callbacks (Base)" level={assessment.callbacks} value={`${fmtNative(assessment.vaultSpendable, "ETH", 5)} callback balance`} />
+            <p className="text-xs text-fg-muted">
+              Reserve covers ≈ {assessment.runwayHoursWhileOpen.toFixed(1)} h of automation while tasks are open (measured testnet rate).
+            </p>
             <p className="text-xs text-fg-subtle">
               {data.openTasks > 0n
                 ? `Scheduled checks running (${assessment.tier?.name ?? "cron"}) for ${data.openTasks.toString()} open task(s)`
@@ -141,7 +144,15 @@ export function FundingDetail() {
             <KV k="Cron subscription" v={data.cronSubscribed ? `On · ${assessment.tier?.name} (${assessment.tier?.approx})` : "Off"} warn={data.openTasks > 0n && !data.cronSubscribed} />
             <KV k="Est. cost per reaction" v={`≈ ${fmtNative(assessment.perReaction, "lREACT", 4)}`} />
             <KV k="Est. cron cost per day (now)" v={`≈ ${fmtNative(assessment.cronPerDay, "lREACT", 3)}`} />
-            {assessment.runwayDays !== null && <KV k="Est. runway at current cron" v={`≈ ${assessment.runwayDays.toFixed(1)} days`} />}
+            <KV
+              k="Runway while any task is open (measured)"
+              v={`≈ ${assessment.runwayHoursWhileOpen.toFixed(1)} h`}
+              warn={assessment.runwayHoursWhileOpen < 12}
+            />
+            <p className="text-xs text-fg-subtle">
+              Measured on Lasna: ≈{(OBSERVED_LREACT_PER_MIN_WHILE_OPEN * 1440).toFixed(1)} lREACT per day while scheduled checks run. A reserve in
+              debt pauses automation for every task until topped up; anyone can top up with depositTo on the system contract.
+            </p>
             <p className="pt-1 text-xs text-fg-subtle">
               The full subscription list isn&apos;t readable over a standard RPC. Verify it with Reactive&apos;s tools or on Reactscan.
             </p>

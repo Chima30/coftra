@@ -81,3 +81,28 @@ No unresolved Critical or High findings remain within this scope.
 - Dynamic per-session subscriptions.
 - Cross-chain verifier registries (the architecture supports them; not deployed).
 - Rebasing tokens. They must not be allow-listed.
+
+## Final pre-submission pass (2026-11-18)
+
+This is still an internal review, not an independent audit.
+
+**Deployed code matches the source.** Runtime bytecode of all five deployed contracts is identical to `forge build` of the current `contracts/src`, with only the immutable slots masked; see `docs/deployment/VERIFY_SOURCE.md`. No contract was changed or redeployed in this pass.
+
+**Re-checked areas, with no new contract findings:**
+- **Access control.** Task owner gates activate, cancel, extend and override. The verifier is pinned per milestone and checked again in the vault. The executor is pinned per session. Callbacks require the Reactive proxy and the immutable RC address. The admin can only pause creation, manage the token allow-list and withdraw native ETH.
+- **Accounting.** Per-task `deposited / released / refunded`; `totalLiabilities` equals open balances plus credits, under invariant test. A milestone `done` flag prevents duplicate payouts.
+- **Lifecycle.** Terminal states are absorbing. Late or duplicate callbacks change nothing (`test_lateCallbacksAfterCloseChangeNothing`, new). In a completion/expiry race, destination time decides.
+- **External calls.** One pinned selector per session, beneficiary bound in calldata, exact approval reset to zero, no delegatecall, every mutator `nonReentrant`.
+- **NFT custody.** The vault never holds NFTs: session mints go straight to the beneficiary, which is the task owner, so there is no withdrawal path to get wrong.
+- **Timestamps.** Every deadline, cooldown and retry uses `block.timestamp`, as the buildathon rules require for Base Sepolia's 200 ms blocks.
+- **Slither.** Unchanged: 0 High; 2 Medium are the reviewed false positives (SR-5/6/7).
+
+| ID | Area | Finding | Status |
+|---|---|---|---|
+| FE-1 | Frontend | A transaction cancelled or replaced in the wallet would have been reported as "Confirmed" (viem returns the replacement's receipt) | **Fixed.** Replacement reason checked; cancelled or replaced is shown as not run |
+| FE-2 | Frontend | Write actions weren't pinned to Base Sepolia; a wallet on another network could be asked to send there | **Fixed.** `chainId` pinned on every write; wagmi refuses on mismatch |
+| FE-3 | Frontend | Funding health stayed on a loading placeholder forever when the RPCs failed | **Fixed.** Shows "Unknown"; nothing assumed healthy |
+| FE-4 | Dependencies | 9 advisories (5 high, 4 moderate) in wagmi's optional WalletConnect, Coinbase and Gemini connector trees (ws, zod, picomatch, decode-uri-component, uuid), all DoS-class | **Accepted, not exposed.** Coftra imports only the `injected` connector; none of these packages are in the client bundle (checked `.next/static`) |
+| OPS-1 | Operations | The reactive reserve drains ≈11.3 lREACT per day while any task is open (measured). 2.06 lREACT covers ≈4.4 h. If it runs out, automation pauses for every task until topped up | **Mitigated in UI**: runway shown, health "Running low" under 12 h, builder warns when a deadline outlasts the reserve. **Needs the owner**: top up before judging. Funds are never at risk; manual paths remain |
+
+No issue found that could expose user funds.

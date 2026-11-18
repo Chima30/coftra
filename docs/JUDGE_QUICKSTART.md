@@ -9,6 +9,14 @@
 
 ## 1. Open the verified demo (1 minute)
 
+Each loop also has its own shareable page: `/proof/checkpoint`, `/proof/project-closeout`, `/proof/session-closeout`, `/proof/fallback`.
+
+To re-verify all four loops from raw chain data (58 checks: chains, emitters, event signatures, origin links, token movements, final state):
+
+```bash
+cd apps/web && pnpm install && pnpm verify:proofs
+```
+
 Open `/proof`. It walks through four real loops and re-fetches every receipt from both chains when the page loads. It says when a receipt couldn't be re-checked rather than showing it as verified. Every hash links to Basescan or Reactscan.
 
 ## 2. The four recorded loops

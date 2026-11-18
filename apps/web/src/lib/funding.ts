@@ -23,6 +23,13 @@ export const CRON_TIERS: Record<string, { name: string; blocks: number; approx: 
   "0xd214e1d84db704ed42d37f538ea9bf71e44ba28bc1cc088b2f5deca654677a56": { name: "Cron10000", blocks: 10000, approx: "~3 h" },
 };
 
+/**
+ * Measured on Lasna 2026-11-18 from archive reserves: 0.4151 lREACT over 52.9 min with Cron100 running and
+ * a few demo reactions. Used for runway because it reflects what the deployed contract actually spends
+ * while any task is open. Testnet value; it changes with fee parameters.
+ */
+export const OBSERVED_LREACT_PER_MIN_WHILE_OPEN = 0.00785;
+
 const LASNA_BLOCK_SECONDS = 1.077; // MCP estimate_cost, 2026-11-17
 
 export type HealthLevel = "ok" | "low" | "blocked";
@@ -40,12 +47,16 @@ export function assessFunding(h: FundingHealth) {
   const rcSpendable = h.rcReserves > h.rcDebt ? h.rcReserves - h.rcDebt : 0n;
   const vaultSpendable = h.vaultBalance > h.proxyDebt ? h.vaultBalance - h.proxyDebt : 0n;
 
+  const runwayHoursEarly = Number(rcSpendable) / 1e18 / OBSERVED_LREACT_PER_MIN_WHILE_OPEN / 60;
+  // Low when the reserve covers under 12 h of open-task automation at the measured rate.
   const reactive: HealthLevel =
-    h.rcDebt > 0n || h.paused ? "blocked" : rcSpendable < perReaction * 50n ? "low" : "ok";
+    h.rcDebt > 0n || h.paused ? "blocked" : rcSpendable < perReaction * 50n || runwayHoursEarly < 12 ? "low" : "ok";
   const callbacks: HealthLevel =
     h.proxyDebt > 0n ? "blocked" : vaultSpendable < perCallback * 10n ? "low" : "ok";
 
   const runwayDays = cronPerDay > 0n ? Number(rcSpendable) / Number(cronPerDay) : null;
+  /** Hours of open-task automation the reserve covers at the measured rate. */
+  const runwayHoursWhileOpen = runwayHoursEarly;
   const callbacksAffordable = perCallback > 0n ? Number(vaultSpendable / perCallback) : null;
 
   return {
@@ -59,6 +70,7 @@ export function assessFunding(h: FundingHealth) {
     reactive,
     callbacks,
     runwayDays,
+    runwayHoursWhileOpen,
     callbacksAffordable,
     canActivate: reactive !== "blocked" && callbacks !== "blocked",
   };

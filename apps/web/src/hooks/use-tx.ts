@@ -6,6 +6,7 @@ import { waitForTransactionReceipt, writeContract, type WriteContractParameters 
 import type { Abi, ContractFunctionArgs, ContractFunctionName } from "viem";
 import type { wagmiConfig } from "@/lib/wagmi";
 import { BaseError, ContractFunctionRevertedError, type Hash } from "viem";
+import { destination } from "@/lib/chains";
 import { useQueryClient } from "@tanstack/react-query";
 
 export type TxStatus = "idle" | "signing" | "pending" | "confirmed" | "failed";
@@ -40,7 +41,14 @@ export function explainError(e: unknown): string {
       const name = revert.data?.errorName;
       if (name) return `${humanError[name] ?? name}`;
     }
-    if (e.shortMessage.toLowerCase().includes("user rejected")) return "You rejected the request in your wallet.";
+    const msg = `${e.shortMessage} ${e.name}`.toLowerCase();
+    if (msg.includes("user rejected") || msg.includes("user denied")) return "You rejected the request in your wallet. Nothing was sent.";
+    if (msg.includes("chainmismatch") || msg.includes("chain mismatch") || msg.includes("does not match the target chain"))
+      return "Your wallet is on another network. Switch to Base Sepolia and try again.";
+    if (msg.includes("insufficient funds")) return "Not enough Base Sepolia ETH to pay for gas.";
+    if (msg.includes("connector not connected") || msg.includes("connector not found")) return "Your wallet is disconnected. Connect it and try again.";
+    if (msg.includes("timed out") || msg.includes("timeout") || msg.includes("http request failed") || msg.includes("429"))
+      return "The network RPC didn't respond. If you signed, the transaction may still confirm: check Settings → recent transactions before retrying.";
     return e.shortMessage;
   }
   return e instanceof Error ? e.message : "Unknown error";
@@ -75,6 +83,7 @@ export function useTx() {
   const [status, setStatus] = useState<TxStatus>("idle");
   const [hash, setHash] = useState<Hash>();
   const [error, setError] = useState<string>();
+  const [slow, setSlow] = useState(false);
 
   const run = useCallback(
     async <
@@ -87,15 +96,31 @@ export function useTx() {
     ) => {
       setError(undefined);
       setHash(undefined);
+      setSlow(false);
       setStatus("signing");
+      let slowTimer: ReturnType<typeof setTimeout> | undefined;
       try {
-        // Call sites are fully typed by the generic signature above; widen only for the internal call.
-        const h = await writeContract(config, params as never);
+        // Pinned to Base Sepolia: if the wallet is on another network, wagmi refuses instead of sending
+        // the call to a different chain. Call sites are fully typed by the generic signature above.
+        const h = await writeContract(config, { ...(params as object), chainId: destination.id } as never);
         setHash(h);
         addJournal({ hash: h, label, at: Date.now() });
         setStatus("pending");
-        const r = await waitForTransactionReceipt(config, { hash: h });
-        if (r.status !== "success") throw new Error("Transaction reverted on-chain.");
+        slowTimer = setTimeout(() => setSlow(true), 45_000);
+        let replacedReason: string | undefined;
+        const r = await waitForTransactionReceipt(config, {
+          hash: h,
+          chainId: destination.id,
+          // viem follows replacements. A sped-up transaction is the same call; a cancelled or replaced one is
+          // not, and its receipt must never be reported as this action succeeding.
+          onReplaced: (rep) => {
+            replacedReason = rep.reason;
+            setHash(rep.transaction.hash);
+          },
+        });
+        if (replacedReason === "cancelled") throw new Error("You cancelled this transaction in your wallet. Nothing was changed.");
+        if (replacedReason === "replaced") throw new Error("Your wallet replaced this transaction with a different one, so this action did not run.");
+        if (r.status !== "success") throw new Error("The transaction was mined but reverted. Nothing was changed.");
         setStatus("confirmed");
         await qc.invalidateQueries();
         return r;
@@ -103,6 +128,9 @@ export function useTx() {
         setError(explainError(e));
         setStatus("failed");
         return null;
+      } finally {
+        if (slowTimer) clearTimeout(slowTimer);
+        setSlow(false);
       }
     },
     [config, qc],
@@ -114,7 +142,7 @@ export function useTx() {
     setHash(undefined);
   }, []);
 
-  return { run, status, hash, error, reset, busy: status === "signing" || status === "pending" };
+  return { run, status, hash, error, reset, slow, busy: status === "signing" || status === "pending" };
 }
 
 /** Reconcile journal entries with chain receipts after a reload. */

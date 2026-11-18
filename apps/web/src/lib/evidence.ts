@@ -204,5 +204,5 @@ export const OBSERVED_COSTS = {
   callbackGas: "143,452–162,924 gas per callback",
   reactGas: "78,678–95,207 gas per react() on Lasna",
   reactionFee: "≈0.016–0.022 lREACT per reaction (Reactive MCP estimate with the live fee parameters)",
-  cronDrain: "Reserves fell 0.5 → 0.134 lREACT in ~90 min while Cron100 ran with an open task (≈0.004 lREACT per minute)",
+  cronDrain: "Measured from archive state: 0.415 lREACT over 52.9 min while Cron100 ran with open tasks (≈0.0079 lREACT per minute, ≈11 per day)",
 } as const;

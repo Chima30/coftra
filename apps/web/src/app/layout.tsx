@@ -9,7 +9,10 @@ const sans = IBM_Plex_Sans({ subsets: ["latin"], weight: ["400", "500", "600"], 
 const mono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-plex-mono" });
 
 export const metadata: Metadata = {
+  // Absolute base for canonical and Open Graph URLs. Override with NEXT_PUBLIC_SITE_URL on a custom domain.
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://web-two-pied-ft7sms1616.vercel.app"),
   title: "Coftra — on-chain tasks that finish themselves",
+  openGraph: { siteName: "Coftra", type: "website" },
   description:
     "Fund a task, set its rules, and let Reactive Network release milestones, close out sessions and recover leftovers on verifiable on-chain events.",
 };
