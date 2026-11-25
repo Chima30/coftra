@@ -8,6 +8,8 @@ import { encodeFunctionData } from "viem";
 import { PageHeader } from "@/components/app-shell";
 import { FundsBar, StateBadge } from "@/components/task-bits";
 import { TaskLabelEditor } from "@/components/task-label";
+import { IncomingCard } from "@/components/role-cards";
+import { TaskStory } from "@/components/task-story";
 import { DeadlineCountdown } from "@/components/deadline";
 import { ShareTaskButton } from "@/components/share";
 import { useTaskLabel } from "@/lib/labels";
@@ -43,6 +45,7 @@ export function TaskView({ params }: { params: Promise<{ id: string }> }) {
 }
 
 function Detail({ t }: { t: T }) {
+  const [label] = useTaskLabel(t.id);
   const { address } = useAccount();
   const state = t.task.state as TaskState;
   const kind = t.task.kind as TaskKind;
@@ -98,6 +101,7 @@ function Detail({ t }: { t: T }) {
       />
       <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
         <div className="min-w-0 space-y-6">
+          {address && <IncomingCard t={t} me={address} linked={false} />}
           <Card>
             <div className="grid grid-cols-2 gap-5 p-5 md:grid-cols-4">
               <Stat label="Deposited" value={fmtToken(t.task.deposited)} />
@@ -140,6 +144,8 @@ function Detail({ t }: { t: T }) {
           </Card>
 
           {kind === TaskKind.ProjectBudget ? <Milestones t={t} verifierOf={verifierOf} isOwner={isOwner} /> : <SessionPanel t={t} isExecutor={isExecutor} />}
+
+          <TaskStory t={t} label={label || undefined} />
 
           <Timeline id={t.id} />
         </div>

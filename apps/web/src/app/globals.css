@@ -107,3 +107,26 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Printable receipt: the task story card prints alone, in light colours, when its button sets data-print. */
+@media print {
+  body[data-print="receipt"] {
+    background: #fff !important;
+    color: #000 !important;
+  }
+  body[data-print="receipt"] * {
+    visibility: hidden;
+  }
+  body[data-print="receipt"] [data-receipt],
+  body[data-print="receipt"] [data-receipt] * {
+    visibility: visible;
+    color: #000 !important;
+    border-color: #ccc !important;
+    background: transparent !important;
+  }
+  body[data-print="receipt"] [data-receipt] {
+    position: absolute;
+    inset: 0 0 auto 0;
+    border: 0;
+  }
+}
