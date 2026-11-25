@@ -6,6 +6,9 @@ import { ArrowLeft, Check, Link2 } from "lucide-react";
 import { RecheckBanner, ScenarioCard } from "@/components/verified";
 import { Button, Card } from "@/components/ui/primitives";
 import { LINKS, SCENARIOS } from "@/lib/evidence";
+import { MOVEMENTS } from "@/lib/evidence-replay";
+import { AutomationReplay } from "@/components/replay";
+import { Hex } from "@/components/hex";
 
 /** One verified loop on its own shareable page. Same data and live re-check as /proof. */
 export function ScenarioDetailView({ id }: { id: string }) {
@@ -39,6 +42,37 @@ export function ScenarioDetailView({ id }: { id: string }) {
         </Button>
       </Card>
       <ScenarioCard s={s} />
+      <Card>
+        <div className="border-b border-border px-5 py-3">
+          <h2 className="text-[15px] font-semibold">Asset movements</h2>
+          <p className="text-sm text-fg-muted">Every token and NFT that moved in this loop, from the transaction receipts.</p>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[560px] text-left text-sm">
+            <thead className="text-xs text-fg-subtle">
+              <tr className="border-b border-border">
+                <th className="px-5 py-2 font-medium">What</th>
+                <th className="px-5 py-2 font-medium">From</th>
+                <th className="px-5 py-2 font-medium">To</th>
+                <th className="px-5 py-2 font-medium">Transaction</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {MOVEMENTS[s.id].map((m) => (
+                <tr key={m.what + m.tx}>
+                  <td className="px-5 py-2.5 font-medium">{m.what}</td>
+                  <td className="px-5 py-2.5 text-fg-muted">{m.from}</td>
+                  <td className="px-5 py-2.5 text-fg-muted">{m.to}</td>
+                  <td className="px-5 py-2.5">
+                    <Hex value={m.tx} kind="tx" chainId={84532} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Card>
+      <AutomationReplay initial={s.id} />
       <Card className="p-5 text-sm">
         <div className="font-medium">Other verified loops</div>
         <ul className="mt-2 space-y-1">
