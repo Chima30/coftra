@@ -104,9 +104,11 @@ CLOSEOUT for a session needs all of the following:
 
 Next.js 16 (App Router, Cache Components), wagmi/viem, TanStack Query. All task data comes from contract reads and logs:
 
-- Tasks: `tasksOf`, `tasksInvolving`, then one `multicall` per task.
-- History: chunked `getLogs` on the vault from its deployment block.
+- Tasks: `tasksOf`, `tasksInvolving`, then one `multicall` per task. Open tasks you verify are found from the vault's `TaskActivated` / `TaskClosed` logs, because the vault doesn't index verifiers.
+- History: chunked `getLogs` on the vault from its deployment block. Task pages turn those events into plain sentences and a CSV receipt (`lib/story.ts`).
 - Proofs: receipts on both chains plus the RC's `CallbackRequested` logs.
 - Funding: native balances, `debt()` on the system contract and the callback proxy, gas prices.
+- Pop-ups: while a wallet with tasks is connected, new vault events are read in small block ranges, starting at the block current when the watcher starts, so nothing from the past is announced (`components/reactive-toasts.tsx`, `lib/toasts.ts`).
+- Transactions: the Rule Builder's contract arguments come from pure functions (`lib/tx-builders.ts`). The WHEN / THEN / OTHERWISE diagram, the safety inspector and "What will happen" are built from the same input.
 
-There is no backend. Browser storage holds only the theme and a non-authoritative journal of submitted transaction hashes, reconciled against receipts.
+There is no backend. Browser storage (`localStorage`) holds conveniences only, none of them authoritative: the colour theme, a journal of submitted transaction hashes (reconciled against receipts), private task names, contacts, saved templates, and whether the first-run guide was dismissed. They stay on the device, are never sent anywhere, and are parsed defensively when read: anything malformed is dropped. A saved template only pre-fills the Rule Builder, where every value is validated and shown again before signing.

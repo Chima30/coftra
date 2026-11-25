@@ -4,7 +4,9 @@ Most on-chain tasks don't end when the transaction is sent. Someone still has to
 
 You fund a task, set its rules, and close the tab. [Reactive Network](https://dev.reactive.network/) watches for the events that matter, and a self-custodial vault applies the outcome: it releases a milestone, closes a spending session, or returns what's left when the deadline passes. Every step leaves a proof trail you can open on a block explorer.
 
-**Live app:** https://web-two-pied-ft7sms1616.vercel.app/ · **Verified demo, no wallet needed:** [/proof](https://web-two-pied-ft7sms1616.vercel.app/proof) · **Judges:** [5-minute quickstart](docs/JUDGE_QUICKSTART.md)
+**Live app:** https://web-two-pied-ft7sms1616.vercel.app/ · **Proof Center, no wallet needed:** [/proof](https://web-two-pied-ft7sms1616.vercel.app/proof) · **Judges:** [5-minute quickstart](docs/JUDGE_QUICKSTART.md)
+
+![The Coftra homepage: "On-chain tasks that finish themselves."](docs/images/home-hero.png)
 
 > **Status:** testnet only (Base Sepolia + Reactive Lasna). Contracts are deployed, and CHECKPOINT, CLOSEOUT and FALLBACK are each proven end to end on testnet, each loop taking about 1–3 s from origin to callback. See [docs/IMPLEMENTATION_STATUS.md](docs/IMPLEMENTATION_STATUS.md). Not audited. Don't use it with real funds.
 >
@@ -49,6 +51,34 @@ Vault: TaskActivated/Closed ──┘     ├ relays attestations / mints       
 - **Funding Health.** Live balances and debts on both chains, with labelled cost estimates. Activation is blocked when automation couldn't run.
 - **Never stuck.** The owner can release a milestone directly, and anyone can run the fallback by hand 30 minutes after a deadline.
 
+## What you can do in the app
+
+**See it work, without a wallet.** The Proof Center shows each of the four recorded runs as five stages: origin event, Reactive execution, callback request, destination transaction and verified outcome. Every receipt is re-checked on both chains when the page opens, and every hash opens on Basescan or Reactscan.
+
+![A recorded CHECKPOINT run in the Proof Center, as five stages with re-checked receipts](docs/images/proof-pipeline.png)
+
+**Understand a rule before you sign it.** The Rule Builder shows the rule as WHEN / THEN / OTHERWISE, runs a safety inspector, and lists "What will happen": every case the rule allows and where the money ends up in each. All three are built from the same values the contract call uses.
+
+**Read a task's history in plain words.** Each task page tells its story from the vault's events, and marks the steps Reactive Network did with a bolt. You can download it as a CSV (exact amounts, transaction hashes, explorer links) or print it as a receipt.
+
+![Task 1's history in plain words: two payments sent by Reactive Network and the reserve returned](docs/images/task-story.png)
+
+**See it from the other side.** My Vaults has a "Paying me" tab (what you were promised, what's paid, what's still to come) and an "I can spend" tab (what's left in a session you may spend from). On a project budget, "Copy link for the recipient" shares the task page with an explanation written for the person being paid, who needs no wallet to follow along.
+
+**Know what needs you.** The Overview lists open tasks most urgent first, including tasks where you're a verifier. While Coftra is open, a small pop-up appears when Reactive Network acts on one of your tasks. It's built from real vault events, never for your own manual actions.
+
+**Reuse what works.** Save a rule as a template at the Review step, or from a task you own, and start the next one in one click. Name the addresses you deal with in Settings → Contacts. Export the history of all your tasks as one CSV from My Vaults.
+
+Task names, contacts and templates live only in your browser. Nothing is sent anywhere, and every screen still shows the real address next to a name.
+
+**How it works, at a glance.** The homepage's animated pipeline shows events flowing through Reactive Network to the three engines. It's an illustration, not live data: real runs are in the Proof Center.
+
+![The animated pipeline: blockchain events, Reactive Network, and the CHECKPOINT, CLOSEOUT and FALLBACK engines](docs/images/automation-pipeline.png)
+
+**Design.** A parchment, editorial look: Instrument Serif headings and IBM Plex Mono text, both open-source (OFL). It's light by default, with an optional warm dark theme in Settings. The public pages were checked at phone width (375 px) with no sideways scrolling.
+
+<img src="docs/images/mobile-home.png" alt="The Coftra homepage on a phone" width="260">
+
 ## Repository
 
 ```
@@ -75,10 +105,15 @@ Four steps across two chains, using a keystore account. See [docs/deployment/DEP
 
 ## Tests
 
-40 Foundry tests:
+41 Foundry tests (`forge test`):
 - **Scenarios:** every engine, callback authentication, forged emitters, duplicate events, completion/expiry races, failed transfers, cross-task isolation, fee-on-transfer rejection, manual recovery.
 - **Fuzz:** conservation of funds, deadline boundaries, spend bounds, random callbacks.
 - **Invariants:** solvency, liability accounting, single settlement, caps, and RC index consistency, all run through a simulated Reactive pipeline.
+
+Web app (`cd apps/web`):
+- **53 Vitest unit tests:** recorded evidence, the WHEN / THEN / OTHERWISE diagram, the safety inspector, the "What will happen" cases, task stories and CSV receipts, recipient and executor views, templates, contacts, the "What needs you" list and pop-up detection.
+- **2 fork tests:** the builder's exact calldata run against the live contracts on a local fork of Base Sepolia (`COFTRA_FORK_RPC=… pnpm test`). They're skipped without a fork RPC.
+- **`pnpm verify:proofs`:** 60 read-only checks that re-verify the four recorded loops from raw chain data.
 
 Slither runs in CI, along with TypeScript, ESLint and a production build.
 
@@ -106,11 +141,14 @@ There has been no independent audit.
 ## Future work
 
 - k-of-n verifiers.
+- Optional email or Telegram alerts (needs a small read-only watcher service).
 - Per-session dynamic subscriptions.
 - Verifier registries on other chains.
 - More vetted session targets.
 - An independent audit before any mainnet use.
 
+More in [docs/ROADMAP.md](docs/ROADMAP.md).
+
 ## Tech stack
 
-Solidity 0.8.30, Foundry, OpenZeppelin 5.4, reactive-lib-omni · Next.js 16, TypeScript (strict), Tailwind 4, wagmi 2, viem 2, TanStack Query 5, lucide.
+Solidity 0.8.30, Foundry, OpenZeppelin 5.4, reactive-lib-omni · Next.js 16, TypeScript (strict), Tailwind 4, wagmi 2, viem 2, TanStack Query 5, lucide · Instrument Serif and IBM Plex Mono (OFL, self-hosted through `next/font`).

@@ -1,23 +1,23 @@
 # Implementation status
 
-_Last updated: 2026-11-17_
+_Last updated: 2026-11-25 (main at `e50a343`)_
 
 ## Summary
 
 | Area | Planned | Implemented | Locally tested | Deployed | Verified end-to-end on testnet |
 |---|---|---|---|---|---|
-| CoftraVault (tasks, accounting, sessions, callbacks) | ✅ | ✅ | ✅ 40 Foundry tests + invariants | ✅ Base Sepolia | ❌ |
-| CoftraReactive (subscriptions, react, cron, index) | ✅ | ✅ | ✅ simulated network | ✅ Lasna, MCP health HEALTHY, 5/5 subscriptions | ❌ |
-| CoftraMilestoneVerifier | ✅ | ✅ | ✅ | ✅ Base Sepolia | ❌ |
+| CoftraVault (tasks, accounting, sessions, callbacks) | ✅ | ✅ | ✅ 41 Foundry tests, including fuzz and invariants | ✅ Base Sepolia | ✅ through the four recorded loops |
+| CoftraReactive (subscriptions, react, cron, index) | ✅ | ✅ | ✅ simulated network | ✅ Lasna, MCP health HEALTHY, 5/5 subscriptions | ✅ through the four recorded loops |
+| CoftraMilestoneVerifier | ✅ | ✅ | ✅ | ✅ Base Sepolia | ✅ CHECKPOINT and project CLOSEOUT |
 | CHECKPOINT engine | ✅ | ✅ | ✅ | ✅ | ✅ Demo A (task 1) |
-| CLOSEOUT engine | ✅ | ✅ | ✅ | ✅ | ✅ Demo B (task 3) |
+| CLOSEOUT engine | ✅ | ✅ | ✅ | ✅ | ✅ Demo B (task 3) and task 1 completing |
 | FALLBACK engine (Reactive Cron) | ✅ | ✅ | ✅ | ✅ | ✅ Demo C (task 2) |
 | Deployment scripts (4 steps, 2 chains) | ✅ | ✅ | ✅ ran on testnet | ✅ | — |
-| Frontend: all 6 sections, builder, Proof Center, funding health | ✅ | ✅ | typecheck, lint, production build; Funding Health, Proof Center and task page checked against live data (local dev server) | ❌ (Vercel) | ❌ |
+| Frontend: Overview, Proof Center, My Vaults, Create, Activity, Templates, Settings, task pages | ✅ | ✅ | typecheck, lint, 53 Vitest unit tests, production build; public pages checked in a browser against live data at desktop width and at 375 px | ✅ Vercel | ⏳ Screens that need a wallet haven't been run with a real wallet yet (see [Product additions](#product-additions-2026-11-25-frontend-only)) |
 | Security review + threat model | ✅ | ✅ | — | — | — |
-| CI (GitHub Actions) | ✅ | ✅ | not yet run on GitHub (no remote) | — | — |
+| CI (GitHub Actions: secrets guard, web, contracts, Slither) | ✅ | ✅ | ✅ green on all 11 pushes to main | — | — |
 
-**The project is not ready for submission yet.** CHECKPOINT, CLOSEOUT and FALLBACK are all proven end to end on testnet (below). Still missing: the hosted frontend, the public repository, the video, and a check of the latest official hackathon requirements.
+The contracts, the four recorded loops, the hosted app, the public repository and CI are done. Still open: a real-wallet run of the newest screens ([WALLET_TEST.md](demo/WALLET_TEST.md), part H), user testing ([plan](demo/USER_TESTING.md), no results claimed) and the demo video.
 
 ## Deployment (2026-11-17)
 
@@ -48,19 +48,19 @@ Issue found and fixed during live testing: `sepolia.base.org` limits `eth_getLog
 ## Live deployment
 
 - App: https://web-two-pied-ft7sms1616.vercel.app/ (Vercel, root directory `apps/web`)
-- Verified demo with no wallet needed: https://web-two-pied-ft7sms1616.vercel.app/proof
+- Proof Center, no wallet needed: https://web-two-pied-ft7sms1616.vercel.app/proof
 - Judge guide: [JUDGE_QUICKSTART.md](JUDGE_QUICKSTART.md)
 
 ## Final audit (2026-11-18)
 
 | Check | Result |
 |---|---|
-| Four recorded loops re-verified from raw receipts and current state | ✅ 58/60 checks (`cd apps/web && pnpm verify:proofs`) |
+| Four recorded loops re-verified from raw receipts and current state | ✅ 60/60 checks (`cd apps/web && pnpm verify:proofs`; re-run 2026-11-25, all passed) |
 | Deployed bytecode vs current source | ✅ All 5 contracts identical apart from immutables (`docs/deployment/VERIFY_SOURCE.md`) |
 | Source verification | ✅ All 5 contracts verified on Sourcify, exact match for runtime and creation (2026-11-25; see `docs/deployment/VERIFY_SOURCE.md`). Basescan not submitted (needs an API key) |
-| Real-wallet website test | ⏳ Not run; step-by-step plan in `docs/demo/WALLET_TEST.md` |
+| Real-wallet website test | ⏳ Not completed. Only wallet connection has been tried so far (reported working; no evidence recorded). Step-by-step plan in `docs/demo/WALLET_TEST.md`, parts A–H |
 | User testing | ❌ Not run; guide in `docs/demo/USER_TESTING.md` |
-| Reactive reserve | 3.2578 lREACT, no debt, cron off, after a 1.2 lREACT top-up (Lasna tx `0x92f3aa5261b752ba0c7075d5d983c04f56c8a4a04f2623ace2f790664803918e`, 2026-11-18). Covers ≈6.9 h of open-task automation at the measured rate (≈11.3 lREACT per day). A larger top-up is still recommended before judging |
+| Reactive reserve | 3.2578 lREACT, no debt, cron off, after a 1.2 lREACT top-up (Lasna tx `0x92f3aa5261b752ba0c7075d5d983c04f56c8a4a04f2623ace2f790664803918e`, 2026-11-18). Covers ≈6.9 h of open-task automation at the measured rate (≈11.3 lREACT per day). Still 3.2578 lREACT on 2026-11-25 (no task open, so nothing is billed). A larger top-up is still recommended before judging |
 | Frontend fixes | Cancelled or replaced transactions no longer shown as confirmed; writes pinned to Base Sepolia; slow-transaction hint; runway warnings; shareable `/proof/<id>` pages |
 
 ## Added 2026-11-25 (frontend only, no contract change)
@@ -73,7 +73,7 @@ Issue found and fixed during live testing: `sepolia.base.org` limits `eth_getLog
 - Rendering verified in headless Chrome against the production build. The builder presets and the Lasna top-up need a connected wallet and have not been exercised in a real wallet yet.
 - Ideas that need a contract change: [ROADMAP.md](ROADMAP.md).
 
-## Product experience upgrade (branch `product-experience-upgrade`, not yet merged)
+## Product experience upgrade (merged into main 2026-11-25)
 
 Frontend only; deployed contracts and addresses unchanged.
 
@@ -89,6 +89,30 @@ Frontend only; deployed contracts and addresses unchanged.
 | Prerender fix | `useNow` no longer reads the clock during prerender (Next.js 16 blocked the build) | Production build passes |
 
 Tests: Foundry 41/41 · Vitest 21/21 with fork (19 + 2 skipped without) · tsc 0 · lint 0 · build 16/16 pages · `verify:proofs` 60/60.
+
+## Product additions (2026-11-25, frontend only)
+
+Built on main between `e8ada6e` and `e50a343`. No contract, address, ABI or transaction-argument change: the Rule Builder still sends exactly what `lib/tx-builders.ts` builds.
+
+"Checked in a browser" means the screen was opened and inspected, on the live site or a local production build reading live chain data. "Real wallet" means exercised with a connected browser wallet, which hasn't happened yet for any screen below that needs one.
+
+| Feature | Where | Unit tests | Checked in a browser | Real wallet |
+|---|---|---|---|---|
+| Editorial redesign: parchment palette, Instrument Serif + IBM Plex Mono (OFL), top navigation, footer, pill buttons | Every page | — | ✅ Desktop and 375 px | Not needed |
+| Animated pipeline under the hero. Labelled "Illustration, not live activity"; pauses off-screen; vertical on phones | Overview without a wallet | — | ✅ Desktop and phone. The reduced-motion path was only checked in code | Not needed |
+| Proof Center as five stages per recorded run (origin, Reactive execution, callback request, destination transaction, verified outcome), with status in words as well as colour | `/proof`, `/proof/<id>` | 7 (recorded evidence) | ✅ Live site, every receipt re-checked | Not needed |
+| Plain-language task story, CSV download, printable receipt | Task pages | 5 (story and CSV) | ✅ Story on tasks 1–3; CSV contents captured on the live site. The print dialog wasn't opened | Not needed |
+| Recipient and executor views: "Paying me" and "I can spend" tabs, recipient card | My Vaults, task pages | 4 | Needs a connected recipient or executor | ❌ Not yet |
+| Contacts: private names shown next to addresses and in stories and receipts | Settings → Contacts | 2 | ✅ Saved a contact; the name appeared on task 1 | Not needed |
+| Recipient share link (`/tasks/<id>?for=recipient`) | Task pages, project budgets | — | ✅ Live site | Not needed |
+| "What needs you": open tasks, most urgent first, including tasks you verify | Overview, wallet connected | 2 | Needs a wallet | ❌ Not yet |
+| Export all your tasks as one CSV | My Vaults | 1 | Needs a wallet | ❌ Not yet |
+| "What will happen": every case the rule allows and where the money ends up | Rule Builder, Review step | 7 | Needs a wallet | ❌ Not yet |
+| Saved templates: save at Review or from a task you own; reuse from Create or Templates (`/create?saved=<id>`) | Create, Templates, task pages | 10 | ✅ Templates list, "Use" link and remove, with a sample stored only in the browser | ❌ Builder reuse and "Save as template" not yet |
+| Pop-ups when Reactive Network acts on one of your tasks | Every page, wallet connected | 3 | Needs a live Reactive event while the page is open | ❌ Not yet |
+| Page titles, a main heading on proof pages, 24 px minimum tap targets | All pages | — | ✅ | Not needed |
+
+Tests at `e50a343`: Foundry 41/41 · Vitest 53 passed, plus 2 fork tests skipped without a fork RPC · tsc 0 · lint 0 · production build passes · `verify:proofs` 60/60 · CI run #11 green.
 
 ## Official submission checklist
 
@@ -123,6 +147,18 @@ Change made because of these rules: Base Sepolia's 200 ms blocks mean about 432,
 - **Networks:** Lasna 5318007 and Base Sepolia 84532 both answered `cast chain-id`. The Base Sepolia callback proxy is `0x476F44b11F5C942c58f4c8E3d0300E5710743585`.
 - **Lasna compatibility:** the `CoftraReactive` creation code (cancun EVM) was run through `eth_call --create` on the live Lasna RPC. It returned runtime bytecode, so the constructor, including `SYSTEM.subscribe`, executes there. Nothing was broadcast.
 
+## Tests run (2026-11-25)
+
+```
+forge test            → 41 passed, 0 failed (3 suites: scenarios, fuzz, invariants)
+pnpm test (Vitest)    → 53 passed, 2 skipped (fork tests; run with COFTRA_FORK_RPC)
+pnpm typecheck        → pass
+pnpm lint             → pass
+pnpm build            → pass
+pnpm verify:proofs    → 60/60 checks passed (read-only, against both chains)
+GitHub Actions        → 11 of 11 runs on main green (secrets guard, web, contracts, Slither)
+```
+
 ## Tests run (2026-11-17)
 
 ```
@@ -147,12 +183,18 @@ The local tests use a mock system contract with real wildcard filtering. Logs fl
 - `docs/`: architecture, security review, deployment, demo runbook, user-testing plan
 - `.github/workflows/ci.yml`, `.env.example`, `.gitignore`
 
-## Blocked on authorization (not done)
+## Previously blocked on authorization (all done)
 
-1. **Testnet deployment** (`docs/deployment/DEPLOY.md`, steps 1–4). Needs a deployer keystore holding Base Sepolia ETH and lREACT, plus explicit approval to broadcast.
-2. **Demo A/B/C transactions** (`docs/demo/DEMO.md`). Need deployment plus `owner` and `bot` wallets.
-3. **Vercel deployment** of `apps/web`. Needs account access and approval.
-4. **Public GitHub repository and CI run.** Needs a remote and approval to push.
+1. ✅ **Testnet deployment** (`docs/deployment/DEPLOY.md`, steps 1–4), signed by the owner's keystore on 2026-11-17.
+2. ✅ **Demo A/B/C transactions** (`docs/demo/DEMO.md`). See Verified evidence below.
+3. ✅ **Vercel deployment** of `apps/web`: https://web-two-pied-ft7sms1616.vercel.app/
+4. ✅ **Public GitHub repository and CI**: https://github.com/Chima30/coftra, green on every push to main.
+
+## Still needs the owner
+
+1. **Real-wallet run** of the website, especially the newest screens ([WALLET_TEST.md](demo/WALLET_TEST.md), part H). Every transaction is signed in the owner's own wallet.
+2. **A larger reserve top-up** on Lasna before judging (Settings → Keep automation running), so automation keeps running while tasks are open.
+3. **User testing** ([plan](demo/USER_TESTING.md)). No results are claimed until it has run.
 
 ## Verified evidence
 
@@ -181,10 +223,12 @@ Issue found and fixed during this run: Lasna receipts for reactive transactions 
 
 ## Known limitations
 
-- Frontend data paths (multicall reads, chunked `getLogs`, proof reconstruction across both RPCs) are type-checked but haven't run against live contracts. Verify them right after deployment.
-- Public RPC `getLogs` limits vary. The reader halves its block range on errors, but a very old deployment on a strict RPC will load slowly.
-- The CI workflow hasn't run on GitHub. The Slither action and the web job's `--frozen-lockfile` need a first run to confirm.
+- Public RPC `getLogs` limits vary. The reader halves its block range on errors, but a very old deployment on a strict RPC will load slowly. Task pages read the vault's whole history, so the plain-language story can take several seconds to appear.
+- Screens that need a connected wallet are unit-tested and type-checked but haven't been run with a real wallet yet (see the table under Product additions).
+- Task names, contacts and saved templates live in one browser only. They don't follow you to another device, and clearing site data removes them.
+
+Resolved since the first version of this file: the frontend data paths (multicall reads, chunked `getLogs`, proof reconstruction across both RPCs) now run against the live contracts on the hosted app, and CI has run green on GitHub, including the Slither action and the web job's `--frozen-lockfile`.
 
 ## Next stage
 
-Deploy (after approval) → run Demo A/B/C → record hashes above → check the Proof Center and task pages against live data → fix what that exposes → deploy the frontend → record the video.
+Real-wallet run of parts A–H in [WALLET_TEST.md](demo/WALLET_TEST.md) → check every hash on-chain and record it here → user testing with the [plan](demo/USER_TESTING.md).

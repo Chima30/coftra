@@ -3,11 +3,15 @@
 **Coftra** lets you fund an on-chain task and leave. The task can be a budget paid out milestone by milestone, or a bot allowed to spend a capped amount on one action. Reactive Network watches for the events that matter: a verifier's attestation, an NFT mint by a contract Coftra doesn't control, or a deadline passing. It asks the vault to act, and the vault re-checks its own rules, then pays, closes the task and revokes temporary permissions, or refunds what's left. Nobody needs to stay online, and nothing runs on a server.
 
 - **Live app:** https://web-two-pied-ft7sms1616.vercel.app/
-- **Verified demo (no wallet needed):** https://web-two-pied-ft7sms1616.vercel.app/proof
+- **Proof Center (no wallet needed):** https://web-two-pied-ft7sms1616.vercel.app/proof
 - **Source:** https://github.com/Chima30/coftra
 - **Track:** Set It and Forget It · **Networks:** Base Sepolia (84532) + Reactive Lasna (5318007) · testnet only
 
-## 1. Open the verified demo (1 minute)
+## 1. Open the Proof Center (1 minute)
+
+Open `/proof` (**Proof** in the top bar). It walks through four real loops. Each is shown as five stages: origin event, Reactive execution, callback request, destination transaction and verified outcome. The page re-fetches every receipt from both chains when it loads, and says when a receipt couldn't be re-checked rather than showing it as verified. Every hash links to Basescan or Reactscan.
+
+![A recorded CHECKPOINT run in the Proof Center](images/proof-pipeline.png)
 
 Each loop also has its own shareable page: `/proof/checkpoint`, `/proof/project-closeout`, `/proof/session-closeout`, `/proof/fallback`.
 
@@ -17,7 +21,12 @@ To re-verify all four loops from raw chain data (60 checks: chains, emitters, ev
 cd apps/web && pnpm install && pnpm verify:proofs
 ```
 
-Open `/proof`. It walks through four real loops and re-fetches every receipt from both chains when the page loads. It says when a receipt couldn't be re-checked rather than showing it as verified. Every hash links to Basescan or Reactscan.
+## 1b. Then, still without a wallet (2 minutes)
+
+- **A task's history in plain words:** open [`/tasks/1`](https://web-two-pied-ft7sms1616.vercel.app/tasks/1) and scroll to "What happened, in plain words". Steps marked with a bolt were done by Reactive Network. **CSV** downloads the history with exact amounts and explorer links; **Print receipt** prints just that card. Task 2 is the FALLBACK run, and task 3 the spending session.
+- **The recipient's side:** [`/tasks/1?for=recipient`](https://web-two-pied-ft7sms1616.vercel.app/tasks/1?for=recipient) is the link an owner shares with the person being paid. It explains the payment from their side.
+- **How it works, at a glance:** the homepage's animated pipeline. It's an illustration and is labelled as one; real runs are only in the Proof Center.
+- **Whether automation can keep running:** Settings → Automation health shows the reactive reserve, callback balance and runway, read live from both chains.
 
 ## 2. The four recorded loops
 
@@ -52,6 +61,9 @@ Base Sepolia callback proxy: `0x476F44b11F5C942c58f4c8E3d0300E5710743585`. All f
 | [`contracts/src/CoftraVault.sol`](../contracts/src/CoftraVault.sol) | `onMilestoneVerified` / `onOutcome` / `onExpiryCheck` (authenticated with `onlyServiceProvider` + `onlyCallbackSender`); `_close`: the single exit for every final state; `executeSession`: pinned selector, beneficiary and exact allowance |
 | [`contracts/test/`](../contracts/test) | Scenario, fuzz and invariant tests through a simulated Reactive pipeline (`utils/CoftraFixture.sol`) |
 | [`apps/web/src/lib/proof.ts`](../apps/web/src/lib/proof.ts) | How the Proof Center rebuilds origin → reactive → callback from chain data alone |
+| [`apps/web/src/lib/tx-builders.ts`](../apps/web/src/lib/tx-builders.ts) | The exact contract arguments the Rule Builder sends. The same functions feed the wallet call, the unit tests and the fork simulation |
+| [`apps/web/src/lib/story.ts`](../apps/web/src/lib/story.ts) | How a task's vault events become plain sentences and a CSV receipt |
+| [`apps/web/src/lib/outcomes.ts`](../apps/web/src/lib/outcomes.ts) | "What will happen": every case a rule allows, worded the way the vault enforces it |
 
 ## 5. Reproduce
 
@@ -68,9 +80,9 @@ cd apps/web && pnpm install && pnpm dev
 ```
 
 To run a fresh loop yourself, use any Base Sepolia wallet with a little test ETH:
-1. Open Create Automation, press **Get 1,000 test tUSDC**, choose **Conditional Project Budget**, name yourself as verifier, and pick the 15-minute deadline.
+1. Open **Create** in the top bar, press **Get 1,000 test tUSDC**, choose **Conditional Project Budget**, name yourself as verifier, and pick the 15-minute deadline. The Review step shows the rule as WHEN / THEN / OTHERWISE, then "What will happen", the safety inspector and the Safety Preview.
 2. Approve the exact amount and create.
-3. On the task page, press **Attest completion**. The payout appears in Automation Activity, with its Lasna and Base Sepolia hashes, usually within seconds. Or leave the task alone, and FALLBACK refunds it after the deadline.
+3. On the task page, press **Attest completion**. The payout appears in Automation Activity, with its Lasna and Base Sepolia hashes, usually within seconds, and the task's plain-language story gains a step marked as done by Reactive Network. Or leave the task alone, and FALLBACK refunds it after the deadline.
 
 The CLI version is in [`docs/demo/DEMO.md`](demo/DEMO.md).
 
@@ -85,4 +97,5 @@ See [`FAILURE_RECOVERY.md`](FAILURE_RECOVERY.md). Duplicate events, forged emitt
 - Automation depends on Reactive Network availability and on funded reserves (Lasna) and callback balance (Base Sepolia). Manual recovery exists for every path that moves funds out of a task.
 - Sessions support one vetted target (the demo NFT) in this version.
 - Source is verified on Sourcify, not separately on Basescan (that needs an Etherscan API key).
+- The newest screens that need a wallet ("What will happen", saved templates in the builder, "Save as template" on task pages, "What needs you", "Paying me" / "I can spend", export all, and the pop-ups when Reactive Network acts) are unit-tested and type-checked, but haven't been run with a real wallet yet. See [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md#product-additions-2026-11-25-frontend-only).
 - No external user testing yet. The [plan is here](demo/USER_TESTING.md), and no results are claimed.

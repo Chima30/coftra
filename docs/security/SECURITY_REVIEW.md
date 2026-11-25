@@ -106,3 +106,14 @@ This is still an internal review, not an independent audit.
 | OPS-1 | Operations | The reactive reserve drains ≈11.3 lREACT per day while any task is open (measured). 2.06 lREACT covers ≈4.4 h. If it runs out, automation pauses for every task until topped up | **Mitigated in UI**: runway shown, health "Running low" under 12 h, builder warns when a deadline outlasts the reserve. **Partly done**: topped up to 3.26 lREACT (≈6.9 h) on 2026-11-18; a larger top-up is still recommended before judging. Funds are never at risk; manual paths remain |
 
 No issue found that could expose user funds.
+
+## Client-side additions (2026-11-25)
+
+Frontend only, with no contract change. The new screens were reviewed for anything that could mislead a user, leak data or change what gets signed. Still an internal review.
+
+- **What gets signed is unchanged.** The Rule Builder's contract arguments still come from the pure functions in `apps/web/src/lib/tx-builders.ts`, which the unit tests and the fork simulation also use. The new "What will happen" cases, like the diagram and the safety inspector, are built from the same validated input and only describe it.
+- **Browser storage is a convenience, never an authority.** Task names, contacts and saved templates are kept in `localStorage` on the device and are never sent anywhere. They're read as untrusted input: malformed JSON, invalid addresses, amounts that aren't positive, and unknown task kinds are dropped (`parseContacts`, `parseTemplates`, `cleanTemplate`). The template list is capped at 30. A template only pre-fills the form, where every value is validated again and shown in the preview, the safety inspector and the Safety Preview before anything is signed.
+- **Names don't hide addresses.** Wherever an address is displayed, a contact name appears next to it rather than replacing it. Plain-language sentences use the name, but each one links to its transaction on the explorer. Shared links, including the recipient link (`/tasks/<id>?for=recipient`), carry only the task id. That parameter changes the wording of the page, nothing else.
+- **Pop-ups are read-only.** They read new vault events with `getContractEvents`, starting at the block current when the watcher starts. They announce only steps that a Reactive callback in the same transaction applied, and they never sign or send anything.
+- **No HTML injection path.** Names and labels are rendered as text by React. The app has no `dangerouslySetInnerHTML`.
+- **Explanations are labelled as such.** The homepage's animated pipeline is marked "Illustration, not live activity" and shows no hashes, balances or statuses. Real executions appear only in the Proof Center, from chain data.

@@ -1,6 +1,8 @@
 # Real-wallet website test (live app)
 
-**Status: not run yet.** The four recorded loops were driven by scripts. This run exercises the same contracts through the deployed website with a real browser wallet. Mark a row passed only with a transaction hash or a screenshot.
+**Status: not completed.** Part A (wallet connection) was tried and reported working; nothing has been recorded below yet. The four recorded loops were driven by scripts. This run exercises the same contracts through the deployed website with a real browser wallet. Mark a row passed only with a transaction hash or a screenshot.
+
+Short on time? Part H covers the same contract steps as B–F through the newest screens, which have never been run with a real wallet.
 
 **Before you start**
 - Live app: https://web-two-pied-ft7sms1616.vercel.app/
@@ -67,6 +69,28 @@ Nothing here needs a seed phrase or private key. You approve every transaction i
 | G1 | Create a second budget (e.g. 20 tUSDC, one 10 checkpoint, verifier = you, **15-minute** deadline). Do **not** attest | Task Active | Create tx: |
 | G2 | Wait until about 2–4 min after the deadline | Task **Expired**; 20 returned; Activity shows a FALLBACK entry with a Lasna cron origin | Callback tx: |
 | G3 | If it doesn't expire within 35 min, use **Run fallback manually** (enabled 30 min after the deadline) | Task Expired by your own transaction; this is not a Reactive callback | |
+
+## H. Newest screens (added 2026-11-25)
+
+One project budget, start to finish, through the screens added on 2026-11-25. Keep this tab open during H6 and H15: the pop-ups only appear while Coftra is open, and they check for new vault events about every 12 seconds.
+
+| # | Action | Expected | Result / evidence |
+|---|---|---|---|
+| H1 | **Create** → preset **Pay a freelancer in two stages**. Set the recipient to your second address, then Continue | Budget 100, checkpoints 30 and 50, both verified by your connected address; name "Freelancer, two stages" | |
+| H2 | Deadline step: keep **1 hour**, then go to Review | No runway warning, unless the reserve is very low | |
+| H3 | Read **What will happen** | Three cases. "If you confirm both checkpoints before the deadline": your recipient gets 80 tUSDC, and "20 tUSDC comes back to you: the part no checkpoint pays out". "If only checkpoint 1 is confirmed in time": 30 to the recipient, 70 back after the deadline. "If nothing is confirmed before the deadline": 100 back to you | Screenshot: |
+| H4 | Press **Save as template**, keep the name, press Save | "Saved as a template." with a "Start a task from it" link | |
+| H5 | Continue to funding. If needed, press **Get 1,000 test tUSDC**. Then **Approve** (exactly 100) and **Create & activate** | Two signatures (three with the test tokens). "Task #N created and activated" | Approve tx: · Create tx: |
+| H6 | On the task page, read **What happened, in plain words** | "You locked 100 tUSDC in the vault for a project budget." and "You switched the automation on. Reactive Network now watches it." | |
+| H7 | Press **Attest completion** on checkpoint 1 and confirm. Stay on the page | Within about 15–30 s, a pop-up at the bottom right: "Reactive Network · Task #N", "… was paid 30 tUSDC after you confirmed checkpoint 1. Reactive Network sent the payment automatically." | Origin tx: · Pop-up screenshot: |
+| H8 | Check the story again, then press **CSV** and **Print receipt** | A new step 3 marked with a bolt. `coftra-task-N-receipt.csv` has one row per step with exact amounts and explorer links. The print preview shows only the story card | Callback tx (from the bolt step): |
+| H9 | In the Actions card, press **Save as template** and Save | "Saved as a template." Only the owner sees this button | |
+| H10 | **Create** | "Your templates" lists both templates. **Use** on either one opens the Rules step with the same recipient, checkpoints and verifiers, and a deadline about 1 hour from now. Don't create it | |
+| H11 | **Settings → Contacts**: save your recipient address as "Ada". Reopen the task | "Ada" appears next to the recipient address; the story says "Ada was paid 30 tUSDC…" | |
+| H12 | On the task page, press **Copy link for the recipient** and open it in a private window (no wallet) | "Someone is paying you through Coftra" and a "What the recipient gets" card: promised 80, paid so far 30, still to come 50. The story says "You were paid 30 tUSDC…". No contact names here: they stay in your own browser | |
+| H13 | **Overview** → **What needs you** | "Task #N: confirm checkpoint 2 when the work is done. That releases 50 tUSDC to Ada. …", marked as something you have to do | |
+| H14 | **My Vaults** → **Export all (CSV)** | `coftra-tasks-<date>.csv` with the history of every task listed. Optional: connect the recipient's wallet and open the **Paying me** tab, which should show promised 80, paid 30, still to come 50 | |
+| H15 | Back as the owner, attest checkpoint 2 and stay on the page | One pop-up: "Ada was paid 50 tUSDC after you confirmed checkpoint 2. … The task finished: 20 tUSDC came back to you. Reactive Network closed it automatically." Task **Completed** | Callback tx: · Pop-up screenshot: |
 
 ## Error handling (do whichever you can)
 

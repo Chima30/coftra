@@ -31,9 +31,11 @@ The reactive contract on Lasna subscribes only to specific emitters: the verifie
 
 Every automated step is verifiable without a wallet. The `/proof` page and the Proof Center rebuild origin → Reactive → callback from chain data, and `pnpm verify:proofs` re-checks all four recorded loops (60 checks).
 
+The app explains itself in plain words: before you sign, it lists every case the rule allows and where the money ends up. Afterwards, each task page tells the task's history as simple sentences, marks what Reactive Network did, and exports it as a CSV receipt.
+
 **Links:**
 - Live app: https://web-two-pied-ft7sms1616.vercel.app/
-- Verified demo (no wallet needed): https://web-two-pied-ft7sms1616.vercel.app/proof
+- Proof Center (no wallet needed): https://web-two-pied-ft7sms1616.vercel.app/proof
 - Repository: https://github.com/Chima30/coftra
 - Judge quickstart: https://github.com/Chima30/coftra/blob/main/docs/JUDGE_QUICKSTART.md
 - Demo video: `<ADD LINK: under 3 minutes>`
