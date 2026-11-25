@@ -4,6 +4,7 @@ import Link from "next/link";
 import { BookOpen, FolderGit2, ShieldCheck } from "lucide-react";
 import { PageHeader } from "@/components/app-shell";
 import { RecheckBanner, ScenarioCard } from "@/components/verified";
+import { AutomationReplay } from "@/components/replay";
 import { Hex } from "@/components/hex";
 import { Card, CardHeader, buttonStyles } from "@/components/ui/primitives";
 import { CONTRACTS, LINKS, OBSERVED_COSTS, SCENARIOS, sourcifyUrl } from "@/lib/evidence";
@@ -65,6 +66,8 @@ export function ProofView() {
             </a>
           </div>
         </Card>
+
+        <AutomationReplay />
 
         <nav aria-label="Scenarios" className="flex flex-wrap gap-2 text-sm">
           {SCENARIOS.map((s, i) => (
