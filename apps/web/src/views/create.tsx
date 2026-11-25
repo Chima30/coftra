@@ -17,6 +17,8 @@ import { useTx } from "@/hooks/use-tx";
 import { useNow } from "@/hooks/use-now";
 import { saveTaskLabel } from "@/lib/labels";
 import { RuleDiagramView } from "@/components/rule-diagram";
+import { SafetyInspector } from "@/components/safety-inspector";
+import { hasWarnings, inspectRule, type Finding } from "@/lib/inspect";
 import { approveArgs, projectCreateArgs, sessionCreateArgs } from "@/lib/tx-builders";
 import { mockUsdcAbi, vaultAbi } from "@/lib/contracts";
 import { destination } from "@/lib/chains";
@@ -198,6 +200,11 @@ function Builder() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [kind, budget, recipient, refundTo, deadlineTs, milestones, sessionBudget, executor, beneficiary, spendCap, errors]);
+
+  const findings = useMemo(
+    () => (rule && address ? inspectRule(rule, { owner: address, nowTs, runwayHours: fundingAssessment?.runwayHoursWhileOpen }) : []),
+    [rule, address, nowTs, fundingAssessment?.runwayHoursWhileOpen],
+  );
 
   const [touched, setTouched] = useState(false);
   const show = (k: string) => (touched ? errors[k] : null);
@@ -439,8 +446,8 @@ function Builder() {
 
         {(step === 1 || step === 2) && rule && <RuleDiagramView rule={rule} />}
         {step === 3 && rule && <RuleDiagramView rule={rule} onEdit={(st) => setStep(st)} />}
-        {step === 3 && rule && <Review rule={rule} />}
-        {step === 4 && rule && <FundAndActivate rule={rule} label={taskLabel} />}
+        {step === 3 && rule && <Review rule={rule} findings={findings} />}
+        {step === 4 && rule && <FundAndActivate rule={rule} label={taskLabel} findings={findings} />}
 
         {step > 0 && step < 4 && (
           <div className="flex justify-between">
@@ -455,7 +462,7 @@ function Builder() {
   );
 }
 
-function Review({ rule }: { rule: RuleInput }) {
+function Review({ rule, findings }: { rule: RuleInput; findings: Finding[] }) {
   const d = deploymentInfo!;
   const { assessment } = useFundingAssessment();
   const rows: [string, React.ReactNode][] =
@@ -478,10 +485,12 @@ function Review({ rule }: { rule: RuleInput }) {
     ["Deadline", fmtDate(rule.deadline)],
     ["Cancellation", rule.kind === TaskKind.ProjectBudget ? "Only before activation" : "Any time by you"],
     ["Unspent funds go to", <Hex key="rf" value={rule.refundTo} chainId={destination.id} />],
+    ["Your costs", "Gas for two Base Sepolia transactions you sign (approve, create). Reactive execution and callback fees are paid from protocol balances, never from your deposit."],
     ["Vault", <Hex key="v" value={d.vault} chainId={destination.id} />],
   );
   return (
     <div className="space-y-4">
+      <SafetyInspector findings={findings} />
       <Card>
         <CardHeader title="Safety preview" description="This is what the contract will enforce. Read it before you sign." />
         <ul className="space-y-2.5 p-5 text-[15px] leading-relaxed">
@@ -521,7 +530,9 @@ function Review({ rule }: { rule: RuleInput }) {
   );
 }
 
-function FundAndActivate({ rule, label }: { rule: RuleInput; label: string }) {
+function FundAndActivate({ rule, label, findings }: { rule: RuleInput; label: string; findings: Finding[] }) {
+  const mustAck = hasWarnings(findings);
+  const [ackWarnings, setAckWarnings] = useState(false);
   const d = deploymentInfo!;
   const { address } = useAccount();
   const { assessment } = useFundingAssessment();
@@ -633,6 +644,15 @@ function FundAndActivate({ rule, label }: { rule: RuleInput; label: string }) {
           <TxStatusLine status={approve.status} hash={approve.hash} error={approve.error} slow={approve.slow} />
         </div>
 
+        {mustAck && (
+          <label className="flex items-start gap-2 rounded-md border border-warning/40 bg-warning-soft p-3 text-sm">
+            <input type="checkbox" className="mt-1" checked={ackWarnings} onChange={(e) => setAckWarnings(e.target.checked)} />
+            <span>
+              I&apos;ve read the safety inspector&apos;s warning{findings.filter((x) => x.level === "warning").length > 1 ? "s" : ""} (
+              {findings.filter((x) => x.level === "warning").map((x) => x.title).join("; ")}) and want to continue.
+            </span>
+          </label>
+        )}
         <div className="space-y-2">
           <div className="flex items-center justify-between gap-3">
             <div>
@@ -642,7 +662,7 @@ function FundAndActivate({ rule, label }: { rule: RuleInput; label: string }) {
                 {!activateNow && " Activation is held back because automation funding is unhealthy."}
               </div>
             </div>
-            <Button disabled={!approved || create.busy} onClick={doCreate}>
+            <Button disabled={!approved || create.busy || (mustAck && !ackWarnings)} onClick={doCreate}>
               {activateNow ? "Create & activate" : "Create"}
             </Button>
           </div>
