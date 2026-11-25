@@ -138,7 +138,7 @@ export function Workflow() {
       </ol>
       <div className="mt-10 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-border pt-6 text-xs text-fg-muted">
         <span>Measured on testnet: callbacks land about 1–3 seconds after the origin event.</span>
-        <Link href="/proof" className="inline-flex items-center gap-1 text-accent underline-offset-4 hover:underline">
+        <Link href="/proof" className="inline-flex min-h-6 items-center gap-1 text-accent underline-offset-4 hover:underline">
           See the four recorded runs <ArrowRight className="size-3.5" aria-hidden />
         </Link>
       </div>

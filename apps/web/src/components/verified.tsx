@@ -152,7 +152,7 @@ export function ScenarioCard({ s, main = false }: { s: Scenario; main?: boolean 
       <Title className="mt-4 text-[32px] leading-tight sm:text-4xl">{s.title}</Title>
       <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-fg-muted">{s.summary}</p>
 
-      <ol className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5" aria-label="Verified pipeline">
+      <ol className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5" aria-label="Verified pipeline">
         {stages.map((st) => (
           <StageCard key={st.n} st={st} gas={st.check} />
         ))}
@@ -214,7 +214,7 @@ export function VerifiedShowcase() {
               {s.hops.map((h, i) => (
                 <span key={h.hash} className="inline-flex items-center gap-1">
                   <CheckIcon check={data?.[h.hash]} />
-                  <a href={explorerTx(h.chainId, h.hash)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 hover:text-fg hover:underline">
+                  <a href={explorerTx(h.chainId, h.hash)} target="_blank" rel="noreferrer" className="inline-flex min-h-6 items-center gap-1 hover:text-fg hover:underline">
                     {["Origin", "Reactive", "Callback"][i]} <span className="font-mono">{h.hash.slice(0, 8)}…</span>
                     <ExternalLink className="size-3" />
                   </a>

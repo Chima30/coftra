@@ -18,6 +18,9 @@ import { useNow } from "@/hooks/use-now";
 import { saveTaskLabel } from "@/lib/labels";
 import { RuleDiagramView } from "@/components/rule-diagram";
 import { SafetyInspector } from "@/components/safety-inspector";
+import { OutcomePreview } from "@/components/outcome-preview";
+import { SaveTemplateButton, SavedTemplateList } from "@/components/saved-templates";
+import { cleanTemplate, findTemplate, type SavedTemplate } from "@/lib/saved-templates";
 import { FirstAutomationGuide } from "@/components/first-guide";
 import { hasWarnings, inspectRule, type Finding } from "@/lib/inspect";
 import { approveArgs, projectCreateArgs, sessionCreateArgs } from "@/lib/tx-builders";
@@ -110,29 +113,36 @@ function Builder() {
   const { address } = useAccount();
   const params = useSearchParams();
   const initialKind = params.get("template") === "session" ? TaskKind.SpendingSession : TaskKind.ProjectBudget;
+  // "/create?saved=<id>" starts from a template saved in this browser. The builder only renders after mount
+  // (it sits behind the wallet gate), so reading browser storage here can't cause a hydration mismatch.
+  const [tpl] = useState(() => findTemplate(params.get("saved")));
+  const projTpl = tpl?.kind === TaskKind.ProjectBudget ? tpl : undefined;
+  const sessTpl = tpl?.kind === TaskKind.SpendingSession ? tpl : undefined;
 
-  const [step, setStep] = useState(params.get("template") ? 1 : 0);
-  const [kind, setKind] = useState<TaskKind>(initialKind);
+  const [step, setStep] = useState(tpl || params.get("template") ? 1 : 0);
+  const [kind, setKind] = useState<TaskKind>(tpl?.kind ?? initialKind);
 
   // project
-  const [recipient, setRecipient] = useState("");
-  const [milestones, setMilestones] = useState<Milestone[]>([
-    { amount: "30", verifier: address ?? "" },
-    { amount: "50", verifier: address ?? "" },
-  ]);
-  const [budget, setBudget] = useState("100");
+  const [recipient, setRecipient] = useState(projTpl?.recipient ?? "");
+  const [milestones, setMilestones] = useState<Milestone[]>(
+    projTpl?.milestones.map((m) => ({ ...m })) ?? [
+      { amount: "30", verifier: address ?? "" },
+      { amount: "50", verifier: address ?? "" },
+    ],
+  );
+  const [budget, setBudget] = useState(projTpl?.budget ?? "100");
 
   // session
-  const [executor, setExecutor] = useState("");
+  const [executor, setExecutor] = useState(sessTpl?.executor ?? "");
   // The vault requires the beneficiary to be the task owner, so it is always the connected wallet.
   const beneficiary = address ?? "";
-  const [spendCap, setSpendCap] = useState("25");
-  const [sessionBudget, setSessionBudget] = useState("40");
+  const [spendCap, setSpendCap] = useState(sessTpl?.cap ?? "25");
+  const [sessionBudget, setSessionBudget] = useState(sessTpl?.budget ?? "40");
 
   // shared
-  const [taskLabel, setTaskLabel] = useState("");
-  const [deadline, setDeadline] = useState(() => toLocalInput(Math.floor(Date.now() / 1000) + 30 * 60));
-  const [refundTo, setRefundTo] = useState(address ?? "");
+  const [taskLabel, setTaskLabel] = useState(tpl?.name ?? "");
+  const [deadline, setDeadline] = useState(() => toLocalInput(Math.floor(Date.now() / 1000) + (tpl?.durationSec ?? 30 * 60)));
+  const [refundTo, setRefundTo] = useState(tpl?.refundTo ?? address ?? "");
 
   const nowTs = useNow(5_000);
   const deadlineTs = Math.floor(new Date(deadline).getTime() / 1000);
@@ -216,6 +226,35 @@ function Builder() {
 
   const [touched, setTouched] = useState(false);
   const show = (k: string) => (touched ? errors[k] : null);
+
+  /** Fill the form from a saved template; the deadline keeps the template's length, counted from now. */
+  const applyTemplate = (t: SavedTemplate) => {
+    setKind(t.kind);
+    setTaskLabel(t.name);
+    setRefundTo(t.refundTo);
+    setDeadline(toLocalInput(Math.floor(Date.now() / 1000) + t.durationSec));
+    if (t.kind === TaskKind.ProjectBudget) {
+      setBudget(t.budget);
+      setRecipient(t.recipient);
+      setMilestones(t.milestones.map((m) => ({ ...m })));
+    } else {
+      setSessionBudget(t.budget);
+      setExecutor(t.executor);
+      setSpendCap(t.cap);
+    }
+    setTouched(false);
+    setStep(1);
+  };
+
+  /** The current form as a template (Review step). Same strings the form validated. */
+  const formTemplate = (name: string) => {
+    const durationSec = deadlineTs - Math.floor(Date.now() / 1000);
+    return cleanTemplate(
+      kind === TaskKind.ProjectBudget
+        ? { kind, name, budget, recipient, milestones, refundTo, durationSec }
+        : { kind, name, budget: sessionBudget, executor, cap: spendCap, refundTo, durationSec },
+    );
+  };
   const next = () => {
     setTouched(true);
     if (stepValid(step)) {
@@ -254,6 +293,8 @@ function Builder() {
       </ol>
 
       <div className="min-w-0 space-y-4">
+        {step === 0 && <SavedTemplateList onUse={applyTemplate} />}
+
         {step === 0 && (
           <div className="grid gap-4 md:grid-cols-2">
             {[
@@ -280,7 +321,10 @@ function Builder() {
         {step === 0 && (
           <Card className="p-5">
             <h2 className="text-xl">Or start from a preset</h2>
-            <p className="mt-0.5 text-sm text-fg-muted">Fills in a typical setup; you can change every value before signing.</p>
+            <p className="mt-0.5 text-sm text-fg-muted">
+              Fills in a typical setup; you can change every value before signing. You can also save any rule as your own template at the Review
+              step, or from a task&apos;s page.
+            </p>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               {PRESETS.map((p) => (
                 <button
@@ -454,14 +498,18 @@ function Builder() {
 
         {(step === 1 || step === 2) && rule && <RuleDiagramView rule={rule} />}
         {step === 3 && rule && <RuleDiagramView rule={rule} onEdit={(st) => setStep(st)} />}
+        {step === 3 && rule && <OutcomePreview rule={rule} />}
         {step === 3 && rule && <Review rule={rule} findings={findings} />}
         {step === 4 && rule && <FundAndActivate rule={rule} label={taskLabel} findings={findings} />}
 
         {step > 0 && step < 4 && (
-          <div className="flex justify-between">
-            <Button variant="ghost" onClick={() => setStep((s) => s - 1)}>
-              Back
-            </Button>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+              <Button variant="ghost" onClick={() => setStep((s) => s - 1)}>
+                Back
+              </Button>
+              {step === 3 && rule && <SaveTemplateButton build={formTemplate} defaultName={taskLabel.trim() || kindLabel[kind]} />}
+            </div>
             <Button onClick={next}>{step === 3 ? "Continue to funding" : "Continue"}</Button>
           </div>
         )}

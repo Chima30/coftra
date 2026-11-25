@@ -292,7 +292,7 @@ export function CoftraAutomationPipeline() {
 
       <figcaption className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-border pt-5 text-xs text-fg-muted">
         <span>How events become outcomes. This picture is an explanation; it doesn&apos;t show real transactions.</span>
-        <Link href="/proof" className="inline-flex items-center gap-1 text-accent underline-offset-4 hover:underline">
+        <Link href="/proof" className="inline-flex min-h-6 items-center gap-1 text-accent underline-offset-4 hover:underline">
           See real executions in the Proof Center <ArrowRight className="size-3.5" aria-hidden />
         </Link>
       </figcaption>

@@ -17,7 +17,7 @@ export function ScenarioDetailView({ id }: { id: string }) {
   const others = SCENARIOS.filter((x) => x.id !== id);
   return (
     <div className="space-y-5">
-      <Link href="/proof" className="inline-flex items-center gap-1 text-sm text-fg-muted hover:text-fg">
+      <Link href="/proof" className="inline-flex min-h-6 items-center gap-1 text-sm text-fg-muted hover:text-fg">
         <ArrowLeft className="size-4" /> All verified automations
       </Link>
       <Card className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">

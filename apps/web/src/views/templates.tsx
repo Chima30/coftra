@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Flag, KeyRound } from "lucide-react";
 import { PageHeader } from "@/components/app-shell";
 import { Card, buttonStyles } from "@/components/ui/primitives";
+import { SavedTemplateList } from "@/components/saved-templates";
 
 const templates = [
   {
@@ -68,6 +69,9 @@ export function TemplatesView() {
             </Link>
           </Card>
         ))}
+      </div>
+      <div className="mt-6">
+        <SavedTemplateList />
       </div>
       <Card className="mt-6 p-6 text-sm leading-relaxed text-fg-muted">
         <h2 className="text-xl text-fg">What Coftra will not do</h2>

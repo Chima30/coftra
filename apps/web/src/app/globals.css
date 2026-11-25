@@ -217,3 +217,20 @@ h3,
   transform-origin: center;
   animation: coftra-pulse 900ms ease-out forwards;
 }
+
+/* Pop-up notices: a short rise-in, skipped entirely for reduced motion. */
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .toast-in {
+    animation: toast-in 220ms ease-out;
+  }
+}

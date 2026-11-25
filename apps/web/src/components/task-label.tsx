@@ -47,7 +47,7 @@ export function TaskLabelEditor({ taskId }: { taskId: bigint }) {
         setDraft(label);
         setEditing(true);
       }}
-      className="inline-flex items-center gap-1.5 text-sm text-fg-muted hover:text-fg"
+      className="inline-flex min-h-6 items-center gap-1.5 text-sm text-fg-muted hover:text-fg"
       title="Private name, saved only in this browser"
     >
       {label ? <span className="font-medium text-fg">{label}</span> : <span>Add a private name</span>}

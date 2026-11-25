@@ -11,6 +11,8 @@ import { TaskLabelEditor } from "@/components/task-label";
 import { IncomingCard } from "@/components/role-cards";
 import { TaskStory } from "@/components/task-story";
 import { RecipientWelcome } from "@/components/recipient-welcome";
+import { SaveTemplateButton } from "@/components/saved-templates";
+import { templateFromTask } from "@/lib/saved-templates";
 import { useSearchParams } from "next/navigation";
 import { DeadlineCountdown } from "@/components/deadline";
 import { ShareTaskButton } from "@/components/share";
@@ -88,7 +90,7 @@ function Detail({ t }: { t: T }) {
 
   return (
     <>
-      <Link href="/vaults" className="mb-3 inline-flex items-center gap-1 text-sm text-fg-muted hover:text-fg">
+      <Link href="/vaults" className="mb-3 inline-flex min-h-6 items-center gap-1 text-sm text-fg-muted hover:text-fg">
         <ArrowLeft className="size-4" /> My Vaults
       </Link>
       <PageHeader
@@ -448,6 +450,11 @@ function Actions({ t, isOwner }: { t: T; isOwner: boolean }) {
         )}
         {isTerminal(state) && <p className="text-fg-muted">This task is final. Nothing can reopen it or move its funds again.</p>}
         <ShareTaskButton taskId={t.id} forRecipient={t.task.kind === TaskKind.ProjectBudget} />
+        {isOwner && (
+          <div className="flex justify-center">
+            <SaveTemplateButton build={(name) => templateFromTask(t, name)} defaultName={label || `Repeat of task #${t.id}`} />
+          </div>
+        )}
         {!isOwner && !isTerminal(state) && state !== TaskState.Active && <p className="text-fg-muted">Only the owner can act on this task.</p>}
         <TxStatusLine status={tx.status} hash={tx.hash} error={tx.error} slow={tx.slow} />
       </div>

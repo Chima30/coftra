@@ -12,7 +12,7 @@ export function CopyButton({ value, label = "Copy" }: { value: string; label?: s
     <button
       type="button"
       aria-label={`${label} ${value}`}
-      className="rounded-lg p-1 text-fg-subtle hover:bg-surface-2 hover:text-fg"
+      className="rounded-lg p-[5px] text-fg-subtle hover:bg-surface-2 hover:text-fg"
       onClick={async () => {
         try {
           await navigator.clipboard.writeText(value);
@@ -60,7 +60,7 @@ export function Hex({
           target="_blank"
           rel="noreferrer"
           aria-label="Open in block explorer"
-          className="rounded-lg p-1 text-fg-subtle hover:bg-surface-2 hover:text-fg"
+          className="rounded-lg p-[5px] text-fg-subtle hover:bg-surface-2 hover:text-fg"
         >
           <ExternalLink className="size-3.5" />
         </a>

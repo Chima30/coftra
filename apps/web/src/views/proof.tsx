@@ -194,11 +194,11 @@ export function ProofView() {
                 </dt>
                 <dd className="flex flex-wrap items-center gap-3">
                   <Hex value={c.address} chainId={c.chainId} full />
-                  <a href={sourcifyUrl(c.chainId, c.address)} target="_blank" rel="noreferrer" className="text-xs text-accent hover:underline">
+                  <a href={sourcifyUrl(c.chainId, c.address)} target="_blank" rel="noreferrer" className="inline-flex min-h-6 items-center text-xs text-accent hover:underline">
                     verified source (Sourcify)
                   </a>
                   {c.source && (
-                    <a href={c.source} target="_blank" rel="noreferrer" className="text-xs text-fg-muted hover:underline">
+                    <a href={c.source} target="_blank" rel="noreferrer" className="inline-flex min-h-6 items-center text-xs text-fg-muted hover:underline">
                       GitHub
                     </a>
                   )}

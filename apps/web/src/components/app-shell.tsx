@@ -25,6 +25,7 @@ import { cn, shortHex } from "@/lib/format";
 import { Button } from "./ui/primitives";
 import { deploymentInfo } from "@/hooks/use-coftra";
 import { LINKS } from "@/lib/evidence";
+import { ReactiveToasts } from "./reactive-toasts";
 
 const nav = [
   { href: "/", label: "Overview", short: "Overview", icon: LayoutDashboard },
@@ -235,6 +236,8 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       )}
 
+      <ReactiveToasts />
+
       <main id="main" className="flex-1 px-4 py-8 sm:px-6 lg:py-12">
         <div className="mx-auto max-w-6xl">{children}</div>
       </main>
@@ -246,10 +249,10 @@ export function AppShell({ children }: { children: ReactNode }) {
             <p>On-chain tasks that finish themselves. Testnet only: Base Sepolia and Reactive Lasna. Tokens have no value.</p>
           </div>
           <div className="flex flex-col gap-1.5">
-            <a href={LINKS.github} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 hover:text-fg">
+            <a href={LINKS.github} target="_blank" rel="noreferrer" className="inline-flex min-h-6 items-center gap-2 hover:text-fg">
               <FolderGit2 className="size-3.5" aria-hidden /> Source on GitHub
             </a>
-            <a href={LINKS.judgeQuickstart} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 hover:text-fg">
+            <a href={LINKS.judgeQuickstart} target="_blank" rel="noreferrer" className="inline-flex min-h-6 items-center gap-2 hover:text-fg">
               <BookOpen className="size-3.5" aria-hidden /> Docs and judge guide
             </a>
           </div>
