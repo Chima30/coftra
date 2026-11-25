@@ -190,6 +190,9 @@ export const SCENARIOS: Scenario[] = [
   },
 ];
 
+/** Every contract below is source-verified on Sourcify with exact_match (runtime and creation), 2026-11-25. */
+export const sourcifyUrl = (chainId: number, address: string) => `https://repo.sourcify.dev/${chainId}/${address}`;
+
 export const CONTRACTS: { name: string; chainId: number; address: `0x${string}`; source?: string }[] = [
   { name: "CoftraVault", chainId: BASE, address: "0x2335A6D769bb3f6E6D4B1a48f6926A81aEA5b719", source: LINKS.vaultSource },
   { name: "CoftraReactive", chainId: LASNA, address: "0x17B29bC8400FB88de4c885Af4335983cd09c3D96", source: LINKS.reactiveSource },

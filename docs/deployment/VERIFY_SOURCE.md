@@ -1,6 +1,16 @@
 # Source verification
 
-**Status: not yet submitted.** Verification publishes the source to Sourcify and needs the project owner's approval.
+**Status: verified on Sourcify, 2026-11-25.** All five contracts returned `exact_match` for both runtime and creation bytecode, confirmed independently through `https://sourcify.dev/server/v2/contract/<chainId>/<address>`. The creation match also confirms the constructor arguments below.
+
+| Contract | Sourcify |
+|---|---|
+| CoftraVault | https://repo.sourcify.dev/84532/0x2335A6D769bb3f6E6D4B1a48f6926A81aEA5b719 |
+| CoftraReactive | https://repo.sourcify.dev/5318007/0x17B29bC8400FB88de4c885Af4335983cd09c3D96 |
+| CoftraMilestoneVerifier | https://repo.sourcify.dev/84532/0x6AF465995710BA15db53D1a0F0867Ed4f38D3291 |
+| CoftraMockUSDC | https://repo.sourcify.dev/84532/0xa4da96908af4cd2cb4dAAde2359deB221B4F03D5 |
+| CoftraDemoNFT | https://repo.sourcify.dev/84532/0x08643a27E03AEef33daBb629091Cf15730b2d4FD |
+
+Basescan keeps its own verification and was not submitted, since that needs an Etherscan API key. It was not confirmed whether Reactscan displays Sourcify results.
 
 ## Pre-check: does the source match what is deployed?
 

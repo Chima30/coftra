@@ -29,7 +29,7 @@ Three engines share one lifecycle:
 
 The reactive contract on Lasna subscribes only to specific emitters: the verifier registry, a third-party NFT collection's mints, and the vault's own lifecycle events. It keeps a deadline index synced from vault events and retries expiry until the vault acknowledges. It pays for cron only while a task is open. The vault authenticates every callback and re-checks its own rules, so duplicate, late or forged requests change nothing. Manual recovery exists for every path, so funds are never stuck if automation is down.
 
-Every automated step is verifiable without a wallet. The `/proof` page and the Proof Center rebuild origin → Reactive → callback from chain data, and `pnpm verify:proofs` re-checks all four recorded loops (58 checks).
+Every automated step is verifiable without a wallet. The `/proof` page and the Proof Center rebuild origin → Reactive → callback from chain data, and `pnpm verify:proofs` re-checks all four recorded loops (60 checks).
 
 **Links:**
 - Live app: https://web-two-pied-ft7sms1616.vercel.app/
@@ -38,7 +38,7 @@ Every automated step is verifiable without a wallet. The `/proof` page and the P
 - Judge quickstart: https://github.com/Chima30/coftra/blob/main/docs/JUDGE_QUICKSTART.md
 - Demo video: `<ADD LINK: under 3 minutes>`
 
-**Deployed contracts:**
+**Deployed contracts** (all source-verified on Sourcify, exact match):
 
 | Contract | Chain | Address |
 |---|---|---|
@@ -77,4 +77,4 @@ Record in this order. Every transaction shown should be one that has already con
 | 1:10–1:40 | `/proof/session-closeout` | "A bot could spend 25 on one mint. The NFT went to me; the session closed itself, the bot was revoked and 15 came back." |
 | 1:40–2:05 | `/proof/fallback` | "Nobody acted. After the deadline a Reactive Cron tick expired the task, and the vault checked the time itself before refunding." |
 | 2:05–2:30 | Automation Activity → one entry's full proof; Settings → Automation health | "Every step rebuilt from chain data. Funding, runway and recovery are shown honestly." |
-| 2:30–3:00 | Terminal: `pnpm verify:proofs` → "All checks passed" | "58 checks re-verify all four loops from raw chain data. That's why it needs Reactive: outside events and time, with no keeper of my own." |
+| 2:30–3:00 | Terminal: `pnpm verify:proofs` → "All checks passed" | "60 checks re-verify all four loops from raw chain data. That's why it needs Reactive: outside events and time, with no keeper of my own." |

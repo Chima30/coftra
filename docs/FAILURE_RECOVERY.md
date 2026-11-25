@@ -32,7 +32,7 @@ cd contracts && forge test
 | Callback delayed beyond the deadline | Late milestone callbacks rejected (`PastDeadline`); the task then expires once | `test_fallback_completionAndExpiryRaceResolvesOnce` | Local test |
 | Attestation after the task expired | Registry refuses (`NotAttestable`); a forced callback is recorded `InvalidState` | `test_fallback_cronExpiresOverdueTaskAndPreservesPaidMilestones` | Local test |
 | Claiming a credit twice | Second claim reverts `NothingToClaim` | `test_failedPayoutIsCreditedAndClaimableOnce` | Local test |
-| Every one of the four recorded loops | Origin, Reactive request, proxy delivery, origin link in the callback, token movements and final state | `cd apps/web && pnpm verify:proofs` (58 checks against live receipts and state) | On-chain (read-only re-verification) |
+| Every one of the four recorded loops | Origin, Reactive request, proxy delivery, origin link in the callback, token movements and final state | `cd apps/web && pnpm verify:proofs` (60 checks against live receipts and state) | On-chain (read-only re-verification) |
 | Wallet cancels or replaces a pending transaction | The app reports it as cancelled or replaced, never "Confirmed" | `onReplaced` handling in `apps/web/src/hooks/use-tx.ts` | Code review; manual browser test pending (WALLET_TEST X2) |
 | Wallet on the wrong network | Write actions refuse with "switch to Base Sepolia"; nothing sent to another chain | `chainId` pinned on every write in `use-tx.ts` | Code review; manual browser test pending (WALLET_TEST A5) |
 | Browser closed during a transaction | State rebuilt from the chain on reopen; recent hashes reconciled with receipts | Settings → "Transactions sent from this browser" | Manual browser test pending (WALLET_TEST X3) |

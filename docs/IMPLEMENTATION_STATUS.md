@@ -55,9 +55,9 @@ Issue found and fixed during live testing: `sepolia.base.org` limits `eth_getLog
 
 | Check | Result |
 |---|---|
-| Four recorded loops re-verified from raw receipts and current state | ✅ 58/58 checks (`cd apps/web && pnpm verify:proofs`) |
+| Four recorded loops re-verified from raw receipts and current state | ✅ 58/60 checks (`cd apps/web && pnpm verify:proofs`) |
 | Deployed bytecode vs current source | ✅ All 5 contracts identical apart from immutables (`docs/deployment/VERIFY_SOURCE.md`) |
-| Source verification on explorers | ⏳ Commands prepared; awaiting the owner's approval |
+| Source verification | ✅ All 5 contracts verified on Sourcify, exact match for runtime and creation (2026-11-25; see `docs/deployment/VERIFY_SOURCE.md`). Basescan not submitted (needs an API key) |
 | Real-wallet website test | ⏳ Not run; step-by-step plan in `docs/demo/WALLET_TEST.md` |
 | User testing | ❌ Not run; guide in `docs/demo/USER_TESTING.md` |
 | Reactive reserve | 3.2578 lREACT, no debt, cron off, after a 1.2 lREACT top-up (Lasna tx `0x92f3aa5261b752ba0c7075d5d983c04f56c8a4a04f2623ace2f790664803918e`, 2026-11-18). Covers ≈6.9 h of open-task automation at the measured rate (≈11.3 lREACT per day). A larger top-up is still recommended before judging |

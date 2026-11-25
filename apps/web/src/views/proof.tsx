@@ -6,7 +6,7 @@ import { PageHeader } from "@/components/app-shell";
 import { RecheckBanner, ScenarioCard } from "@/components/verified";
 import { Hex } from "@/components/hex";
 import { Card, CardHeader, buttonStyles } from "@/components/ui/primitives";
-import { CONTRACTS, LINKS, OBSERVED_COSTS, SCENARIOS } from "@/lib/evidence";
+import { CONTRACTS, LINKS, OBSERVED_COSTS, SCENARIOS, sourcifyUrl } from "@/lib/evidence";
 import { chainName } from "@/lib/chains";
 
 const approaches = [
@@ -182,7 +182,7 @@ export function ProofView() {
         </Card>
 
         <Card>
-          <CardHeader title="Deployed contracts" description="Testnet only. Source is public on GitHub." action={<ShieldCheck className="size-5 text-fg-subtle" />} />
+          <CardHeader title="Deployed contracts" description="Testnet only. Every contract is source-verified on Sourcify (exact match)." action={<ShieldCheck className="size-5 text-fg-subtle" />} />
           <dl className="divide-y divide-border text-sm">
             {CONTRACTS.map((c) => (
               <div key={c.address} className="grid gap-1 px-5 py-2.5 sm:grid-cols-[260px_1fr]">
@@ -191,9 +191,12 @@ export function ProofView() {
                 </dt>
                 <dd className="flex flex-wrap items-center gap-3">
                   <Hex value={c.address} chainId={c.chainId} full />
+                  <a href={sourcifyUrl(c.chainId, c.address)} target="_blank" rel="noreferrer" className="text-xs text-accent hover:underline">
+                    verified source (Sourcify)
+                  </a>
                   {c.source && (
-                    <a href={c.source} target="_blank" rel="noreferrer" className="text-xs text-accent hover:underline">
-                      source
+                    <a href={c.source} target="_blank" rel="noreferrer" className="text-xs text-fg-muted hover:underline">
+                      GitHub
                     </a>
                   )}
                 </dd>

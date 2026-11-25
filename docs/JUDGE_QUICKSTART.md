@@ -11,7 +11,7 @@
 
 Each loop also has its own shareable page: `/proof/checkpoint`, `/proof/project-closeout`, `/proof/session-closeout`, `/proof/fallback`.
 
-To re-verify all four loops from raw chain data (58 checks: chains, emitters, event signatures, origin links, token movements, final state):
+To re-verify all four loops from raw chain data (60 checks: chains, emitters, event signatures, origin links, token movements, final state):
 
 ```bash
 cd apps/web && pnpm install && pnpm verify:proofs
@@ -42,7 +42,7 @@ How each hop is tied together: the reactive contract copies the origin `txHash` 
 | CoftraMockUSDC (tUSDC, test only) | Base Sepolia | [`0xa4da96908af4cd2cb4dAAde2359deB221B4F03D5`](https://sepolia.basescan.org/address/0xa4da96908af4cd2cb4dAAde2359deB221B4F03D5) |
 | CoftraDemoNFT (test only) | Base Sepolia | [`0x08643a27E03AEef33daBb629091Cf15730b2d4FD`](https://sepolia.basescan.org/address/0x08643a27E03AEef33daBb629091Cf15730b2d4FD) |
 
-Base Sepolia callback proxy: `0x476F44b11F5C942c58f4c8E3d0300E5710743585`. Source code is not yet verified on the explorers; it is public in the repository.
+Base Sepolia callback proxy: `0x476F44b11F5C942c58f4c8E3d0300E5710743585`. All five contracts are **source-verified on Sourcify with an exact match** (runtime and creation bytecode), e.g. [CoftraVault](https://repo.sourcify.dev/84532/0x2335A6D769bb3f6E6D4B1a48f6926A81aEA5b719) and [CoftraReactive](https://repo.sourcify.dev/5318007/0x17B29bC8400FB88de4c885Af4335983cd09c3D96).
 
 ## 4. Key files
 
@@ -84,5 +84,5 @@ See [`FAILURE_RECOVERY.md`](FAILURE_RECOVERY.md). Duplicate events, forged emitt
 - Milestone verifiers are trusted for their own milestones. The owner has a clearly labelled override that pays a checkpoint without the verifier. It's not a Reactive callback and can only pay the fixed recipient.
 - Automation depends on Reactive Network availability and on funded reserves (Lasna) and callback balance (Base Sepolia). Manual recovery exists for every path that moves funds out of a task.
 - Sessions support one vetted target (the demo NFT) in this version.
-- Contract source is not yet verified on Basescan or Reactscan.
+- Source is verified on Sourcify, not separately on Basescan (that needs an Etherscan API key).
 - No external user testing yet. The [plan is here](demo/USER_TESTING.md), and no results are claimed.
