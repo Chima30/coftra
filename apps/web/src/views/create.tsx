@@ -235,17 +235,17 @@ function Builder() {
               onClick={() => setStep(i)}
               aria-current={i === step ? "step" : undefined}
               className={cn(
-                "flex w-full items-center gap-2.5 whitespace-nowrap rounded-md px-3 py-2 text-left text-sm",
-                i === step ? "bg-surface font-medium text-fg ring-1 ring-border" : i < step ? "text-fg-muted hover:text-fg" : "text-fg-subtle",
+                "flex w-full items-center gap-2.5 whitespace-nowrap rounded-full px-3 py-2 text-left text-[13px]",
+                i === step ? "bg-fg text-bg" : i < step ? "text-fg-muted hover:bg-surface-2 hover:text-fg" : "text-fg-subtle",
               )}
             >
               <span
                 className={cn(
                   "flex size-5 shrink-0 items-center justify-center rounded-full border text-[11px]",
-                  i < step ? "border-accent bg-accent text-accent-fg" : i === step ? "border-accent text-accent" : "border-border-strong",
+                  i < step ? "border-success bg-success-soft text-success" : i === step ? "border-bg/60 text-bg" : "border-border-strong",
                 )}
               >
-                {i < step ? <Check className="size-3" /> : i + 1}
+                {i < step ? <Check className="size-3" aria-label="done" /> : i + 1}
               </span>
               {label}
             </button>
@@ -267,7 +267,7 @@ function Builder() {
                   setKind(k);
                   setStep(1);
                 }}
-                className={cn("rounded-lg border bg-surface p-5 text-left transition-colors hover:border-accent", kind === k ? "border-accent" : "border-border")}
+                className={cn("rounded-3xl border bg-surface p-5 text-left transition-colors hover:border-fg/50", kind === k ? "border-fg ring-1 ring-fg" : "border-border")}
               >
                 <Icon className="size-5 text-accent" />
                 <div className="mt-3 font-medium">{kindLabel[k]}</div>
@@ -279,7 +279,7 @@ function Builder() {
 
         {step === 0 && (
           <Card className="p-5">
-            <h2 className="text-[15px] font-semibold">Or start from a preset</h2>
+            <h2 className="text-xl">Or start from a preset</h2>
             <p className="mt-0.5 text-sm text-fg-muted">Fills in a typical setup; you can change every value before signing.</p>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               {PRESETS.map((p) => (
@@ -300,7 +300,7 @@ function Builder() {
                     }
                     setStep(1);
                   }}
-                  className="rounded-md border border-border p-3 text-left text-sm transition-colors hover:border-accent"
+                  className="rounded-2xl border border-border p-3 text-left text-[13px] transition-colors hover:border-fg/50"
                 >
                   <div className="font-medium">{p.title}</div>
                   <div className="mt-0.5 text-[13px] text-fg-muted">{p.body}</div>
@@ -336,7 +336,7 @@ function Builder() {
               </div>
               <div className="space-y-3">
                 {milestones.map((m, i) => (
-                  <div key={i} className="grid gap-3 rounded-md border border-border p-3 md:grid-cols-[1fr_2fr_auto] md:items-start">
+                  <div key={i} className="grid gap-3 rounded-xl border border-border p-3 md:grid-cols-[1fr_2fr_auto] md:items-start">
                     <Field label={`Checkpoint ${i + 1} amount`} htmlFor={`ma${i}`} error={show(`m${i}a`)}>
                       <Input
                         id={`ma${i}`}
@@ -386,7 +386,7 @@ function Builder() {
           <Card>
             <CardHeader title="Permitted spending" description="Exactly one operation is allowed. Anything else is rejected by the vault." />
             <div className="space-y-5 p-5">
-              <div className="rounded-md border border-border bg-surface-2 p-4 text-sm">
+              <div className="rounded-xl border border-border bg-surface-2 p-4 text-sm">
                 <div className="text-fg-muted">Permitted operation</div>
                 <div className="mt-1 font-mono">CoftraDemoNFT.mint(beneficiary)</div>
                 <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-fg-subtle">
@@ -504,7 +504,7 @@ function Review({ rule, findings }: { rule: RuleInput; findings: Finding[] }) {
         <ul className="space-y-2.5 p-5 text-[15px] leading-relaxed">
           {ruleSentences(rule).map((s, i) => (
             <li key={i} className="flex gap-3">
-              <span className="mt-2.5 size-1.5 shrink-0 rounded-full bg-accent" aria-hidden />
+              <span className="mt-2.5 size-1.5 shrink-0 rounded-full bg-fg-subtle" aria-hidden />
               <span>{s}</span>
             </li>
           ))}
@@ -609,7 +609,7 @@ function FundAndActivate({ rule, label, findings }: { rule: RuleInput; label: st
     <Card>
       <CardHeader title="Fund and activate" description="Two wallet confirmations. Nothing moves until you sign." />
       <div className="space-y-5 p-5">
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border p-4">
           <div>
             <div className="text-sm text-fg-muted">Your tUSDC balance</div>
             <div className="tabular text-lg font-semibold">{fmtToken(balance)}</div>
@@ -653,7 +653,7 @@ function FundAndActivate({ rule, label, findings }: { rule: RuleInput; label: st
         </div>
 
         {mustAck && (
-          <label className="flex items-start gap-2 rounded-md border border-warning/40 bg-warning-soft p-3 text-sm">
+          <label className="flex items-start gap-2 rounded-xl border border-warning/40 bg-warning-soft p-3 text-sm">
             <input type="checkbox" className="mt-1" checked={ackWarnings} onChange={(e) => setAckWarnings(e.target.checked)} />
             <span>
               I&apos;ve read the safety inspector&apos;s warning{findings.filter((x) => x.level === "warning").length > 1 ? "s" : ""} (

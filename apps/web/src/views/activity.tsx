@@ -63,7 +63,7 @@ export function ActivityView() {
                 onClick={() => setFilter(f)}
                 className={cn(
                   "rounded-full border px-3 py-1 text-sm",
-                  filter === f ? "border-accent bg-accent-soft text-accent" : "border-border text-fg-muted hover:text-fg",
+                  filter === f ? "border-fg bg-fg text-bg" : "border-border text-fg-muted hover:border-fg/40 hover:text-fg",
                 )}
               >
                 {f}

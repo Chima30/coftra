@@ -53,7 +53,7 @@ export function ContactsCard() {
               <button
                 type="button"
                 aria-label={`Remove ${n}`}
-                className="rounded p-1.5 text-fg-subtle hover:bg-surface-2 hover:text-danger"
+                className="rounded-lg p-1.5 text-fg-subtle hover:bg-surface-2 hover:text-danger"
                 onClick={() => removeContact(a)}
               >
                 <Trash2 className="size-4" />

@@ -47,14 +47,14 @@ export function TemplatesView() {
         {templates.map(({ key, icon: Icon, name, engines, who, example, enforces }) => (
           <Card key={key} className="flex flex-col p-6">
             <Icon className="size-6 text-accent" />
-            <h2 className="mt-3 text-lg font-semibold">{name}</h2>
+            <h2 className="mt-3 text-2xl">{name}</h2>
             <div className="mt-1 font-mono text-xs text-fg-subtle">{engines}</div>
             <p className="mt-3 text-sm text-fg-muted">
               <span className="font-medium text-fg">Good for: </span>
               {who}
             </p>
-            <p className="mt-3 rounded-md bg-surface-2 p-3 text-sm leading-relaxed text-fg-muted">{example}</p>
-            <h3 className="mt-4 text-sm font-medium">Enforced on-chain</h3>
+            <p className="mt-3 rounded-xl bg-surface-2 p-3 text-sm leading-relaxed text-fg-muted">{example}</p>
+            <h3 className="mt-4 text-lg">Enforced on-chain</h3>
             <ul className="mt-2 flex-1 space-y-1.5 text-sm text-fg-muted">
               {enforces.map((e) => (
                 <li key={e} className="flex gap-2">
@@ -70,7 +70,7 @@ export function TemplatesView() {
         ))}
       </div>
       <Card className="mt-6 p-6 text-sm leading-relaxed text-fg-muted">
-        <h2 className="text-base font-semibold text-fg">What Coftra will not do</h2>
+        <h2 className="text-xl text-fg">What Coftra will not do</h2>
         <p className="mt-2">
           It doesn&apos;t control your wallet, can&apos;t reverse confirmed transactions, and can&apos;t recover funds held by other protocols. It only
           manages what you deposit into the vault, under the rules you see before signing. Arbitrary contract calls, delegatecall and open-ended

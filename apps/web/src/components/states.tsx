@@ -20,10 +20,10 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <Card className="flex flex-col items-center px-6 py-12 text-center">
+    <Card className="relative flex flex-col items-center overflow-hidden rounded-[32px] px-6 py-14 text-center">
       {icon && <div className="mb-3 text-fg-subtle">{icon}</div>}
-      <h3 className="text-base font-semibold text-fg">{title}</h3>
-      {body && <p className="mt-1.5 max-w-md text-sm text-fg-muted">{body}</p>}
+      <h3 className="text-[26px] text-fg">{title}</h3>
+      {body && <p className="mt-2 max-w-md text-[13px] leading-relaxed text-fg-muted">{body}</p>}
       {action && <div className="mt-5">{action}</div>}
     </Card>
   );

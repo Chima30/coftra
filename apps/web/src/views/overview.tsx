@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { useAccount } from "wagmi";
 import { useEffect, useState } from "react";
-import { ArrowRight, BadgeCheck, CircleCheck, Clock3, Flag, Radio, ShieldCheck } from "lucide-react";
+import { Clock3, Radio, ShieldCheck } from "lucide-react";
+import { Engines, Hero, Workflow } from "@/components/landing";
+import { CoftraAutomationPipeline } from "@/components/automation-pipeline";
 import { PageHeader } from "@/components/app-shell";
 import { Card, CardHeader, Stat, Skeleton, buttonStyles } from "@/components/ui/primitives";
 import { TaskRow } from "@/components/task-bits";
@@ -15,24 +17,6 @@ import { FirstAutomationGuide, ShowGuideLink } from "@/components/first-guide";
 import { deploymentInfo, useMyTasks } from "@/hooks/use-coftra";
 import { fmtToken, relTime } from "@/lib/format";
 import { TaskState } from "@/lib/protocol";
-
-const engines = [
-  {
-    icon: Flag,
-    name: "CHECKPOINT",
-    body: "A verifier you name attests a milestone on-chain. Reactive Network relays it, and the vault releases exactly that milestone's amount. Once.",
-  },
-  {
-    icon: CircleCheck,
-    name: "CLOSEOUT",
-    body: "When the outcome you funded actually happens on-chain, the task finalises: temporary spending rights are revoked and leftovers go back.",
-  },
-  {
-    icon: Clock3,
-    name: "FALLBACK",
-    body: "If the deadline passes first, a Reactive Cron check expires the task. Completed payouts stand; everything unspent is returned.",
-  },
-];
 
 const trySteps = [
   {
@@ -56,23 +40,23 @@ const trySteps = [
 function HowToTry() {
   return (
     <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
-      <Card className="p-5">
-        <h2 className="text-[15px] font-semibold">Try it yourself in about 10 minutes</h2>
-        <ol className="mt-4 grid gap-4 sm:grid-cols-2">
+      <Card className="rounded-[32px] p-6 sm:p-8">
+        <h2 className="text-3xl">Try it yourself in about ten minutes</h2>
+        <ol className="mt-6 grid gap-6 sm:grid-cols-2">
           {trySteps.map((s, i) => (
             <li key={s.title} className="flex gap-3">
-              <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-accent-soft text-xs font-semibold text-accent">{i + 1}</span>
+              <span className="flex size-7 shrink-0 items-center justify-center rounded-full border border-fg/70 text-xs text-fg">{i + 1}</span>
               <div>
-                <div className="text-sm font-medium">{s.title}</div>
-                <p className="mt-0.5 text-[13px] leading-relaxed text-fg-muted">{s.body}</p>
+                <div className="text-[13px] font-medium">{s.title}</div>
+                <p className="mt-1 text-[13px] leading-relaxed text-fg-muted">{s.body}</p>
               </div>
             </li>
           ))}
         </ol>
       </Card>
-      <Card className="p-5 text-[13px] leading-relaxed text-fg-muted">
-        <h2 className="text-[15px] font-semibold text-fg">What Coftra controls</h2>
-        <ul className="mt-3 space-y-2">
+      <Card className="rounded-[32px] bg-surface-2 p-6 text-[13px] leading-relaxed text-fg-muted sm:p-8">
+        <h2 className="text-3xl text-fg">What Coftra controls</h2>
+        <ul className="mt-5 space-y-3">
           <li>
             <span className="font-medium text-fg">Only what you deposit.</span> The vault holds each task&apos;s funds separately. It never gets access to
             your wallet.
@@ -92,51 +76,28 @@ function HowToTry() {
 
 function Intro() {
   return (
-    <div className="space-y-6">
-      <Card className="px-6 py-8 sm:px-8">
-        <p className="text-sm font-medium text-accent">Set it and forget it</p>
-        <h2 className="mt-2 max-w-2xl text-2xl font-semibold leading-snug tracking-tight text-fg sm:text-[28px]">
-          On-chain tasks don&apos;t end when the transaction is sent.
-        </h2>
-        <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-fg-muted">
-          Someone still has to check the outcome, release payments, revoke temporary permissions and recover leftover
-          funds. Coftra does those steps for you, triggered by verifiable blockchain events through Reactive Network, so
-          you can close the tab and come back to a finished task with a proof trail.
-        </p>
-        <div className="mt-6 flex flex-wrap gap-3">
-          <Link href="/proof" className={buttonStyles({ size: "lg" })}>
-            <BadgeCheck className="size-4" /> See 4 verified automations
-          </Link>
-          <Link href="/create" className={buttonStyles({ variant: "secondary", size: "lg" })}>
-            Try it on testnet <ArrowRight className="size-4" />
-          </Link>
-        </div>
-        <p className="mt-3 text-xs text-fg-subtle">The verified demo needs no wallet. Every transaction opens on its block explorer.</p>
-      </Card>
-      <HowToTry />
-      <div className="grid gap-4 md:grid-cols-3">
-        {engines.map(({ icon: Icon, name, body }) => (
-          <Card key={name} className="p-5">
-            <Icon className="size-5 text-accent" />
-            <div className="mt-3 font-mono text-xs font-medium tracking-wide text-fg">{name}</div>
-            <p className="mt-1.5 text-sm leading-relaxed text-fg-muted">{body}</p>
-          </Card>
-        ))}
+    <div className="space-y-14 lg:space-y-20">
+      <div className="space-y-4">
+        <Hero />
+        <CoftraAutomationPipeline />
       </div>
-      <Card className="grid gap-5 p-5 sm:grid-cols-3">
+      <Engines />
+      <Workflow />
+      <HowToTry />
+      <div className="grid gap-6 border-t border-border pt-8 sm:grid-cols-3">
         <div className="flex gap-3">
-          <ShieldCheck className="mt-0.5 size-5 shrink-0 text-fg-subtle" />
-          <p className="text-sm text-fg-muted">Self-custodial. Funds sit in an open-source vault with per-task accounting; no admin can move them.</p>
+          <ShieldCheck className="mt-0.5 size-5 shrink-0 text-fg-subtle" aria-hidden />
+          <p className="text-[13px] leading-relaxed text-fg-muted">Self-custodial. Funds sit in an open-source vault with per-task accounting; no admin can move them.</p>
         </div>
         <div className="flex gap-3">
-          <Radio className="mt-0.5 size-5 shrink-0 text-fg-subtle" />
-          <p className="text-sm text-fg-muted">No server in the loop. Lifecycle transitions are triggered by Reactive Network, not by this website.</p>
+          <Radio className="mt-0.5 size-5 shrink-0 text-fg-subtle" aria-hidden />
+          <p className="text-[13px] leading-relaxed text-fg-muted">No server in the loop. Lifecycle transitions are triggered by Reactive Network, not by this website.</p>
         </div>
         <div className="flex gap-3">
-          <Clock3 className="mt-0.5 size-5 shrink-0 text-fg-subtle" />
-          <p className="text-sm text-fg-muted">Never stuck. If automation is down, anyone can trigger the same fallback by hand 30 minutes after a deadline.</p>
+          <Clock3 className="mt-0.5 size-5 shrink-0 text-fg-subtle" aria-hidden />
+          <p className="text-[13px] leading-relaxed text-fg-muted">Never stuck. If automation is down, anyone can trigger the same fallback by hand 30 minutes after a deadline.</p>
         </div>
-      </Card>
+      </div>
     </div>
   );
 }
@@ -171,7 +132,7 @@ function Dashboard() {
         <div className="space-y-3">
           <NeedsYou />
           <div className="flex items-center justify-between pt-3">
-            <h2 className="text-[15px] font-semibold">Your tasks</h2>
+            <h2 className="text-xl">Your tasks</h2>
             <Link href="/vaults" className="text-sm text-accent hover:underline">View all</Link>
           </div>
           {isLoading ? (
@@ -210,13 +171,15 @@ export function OverviewView() {
   useEffect(() => setMounted(true), []);
   return (
     <>
-      <PageHeader
-        title="Overview"
-        description="Funded tasks, what Reactive Network has done for them, and whether automation can keep running."
-        action={mounted && isConnected ? <ShowGuideLink /> : undefined}
-      />
+      {mounted && isConnected && deploymentInfo && (
+        <PageHeader
+          title="Overview"
+          description="Funded tasks, what Reactive Network has done for them, and whether automation can keep running."
+          action={<ShowGuideLink />}
+        />
+      )}
       {!deploymentInfo ? (
-        <div className="space-y-6">
+        <div className="space-y-10">
           <Intro />
           <NotDeployed />
         </div>

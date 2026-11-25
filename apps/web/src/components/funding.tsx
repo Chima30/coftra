@@ -145,7 +145,7 @@ export function FundingDetail() {
       ) : (
         <div className="grid gap-6 px-5 py-5 md:grid-cols-2">
           <div className="space-y-2 text-sm">
-            <h3 className="font-medium">Reactive contract (Lasna)</h3>
+            <h3 className="text-xl">Reactive contract (Lasna)</h3>
             <KV k="Execution reserve (what reactions are billed from)" v={fmtNative(data.rcReserves, "lREACT", 4)} />
             <KV k="Contract balance (not billed)" v={fmtNative(data.rcBalance, "lREACT", 4)} />
             <KV k="Debt to system contract" v={fmtNative(data.rcDebt, "lREACT", 4)} warn={data.rcDebt > 0n} />
@@ -171,12 +171,12 @@ export function FundingDetail() {
             </p>
           </div>
           <div className="space-y-2 text-sm">
-            <h3 className="font-medium">Vault callbacks (Base Sepolia)</h3>
+            <h3 className="text-xl">Vault callbacks (Base Sepolia)</h3>
             <KV k="Callback balance (charged per callback)" v={fmtNative(data.vaultBalance, "ETH", 6)} />
             <KV k="Debt to callback proxy" v={fmtNative(data.proxyDebt, "ETH", 6)} warn={data.proxyDebt > 0n} />
             <KV k="Est. cost per callback" v={`≈ ${fmtNative(assessment.perCallback, "ETH", 8)}`} />
             {assessment.callbacksAffordable !== null && <KV k="Est. callbacks affordable" v={`≈ ${assessment.callbacksAffordable.toLocaleString()}`} />}
-            <h3 className="pt-3 font-medium">Callback history</h3>
+            <h3 className="pt-3 text-xl">Callback history</h3>
             <CallbackStats />
           </div>
         </div>
@@ -184,7 +184,7 @@ export function FundingDetail() {
       {data && (
         <div className="grid gap-6 border-t border-border px-5 py-4 text-sm md:grid-cols-2">
           <div>
-            <h3 className="font-medium">Tasks automation is watching</h3>
+            <h3 className="text-xl">Tasks automation is watching</h3>
             {data.watchedTasks.length === 0 ? (
               <p className="mt-2 text-fg-muted">None right now, so no scheduled checks are running or billed.</p>
             ) : (
@@ -204,7 +204,7 @@ export function FundingDetail() {
             <p className="mt-2 text-xs text-fg-subtle">Read from the reactive contract&apos;s deadline index, with each state confirmed by the vault.</p>
           </div>
           <div>
-            <h3 className="font-medium">Most recent callbacks</h3>
+            <h3 className="text-xl">Most recent callbacks</h3>
             <div className="-mx-5 mt-1">
               <RecentActivity limit={4} />
             </div>
@@ -212,7 +212,7 @@ export function FundingDetail() {
         </div>
       )}
       <div className="border-t border-border px-5 py-4 text-sm">
-        <h3 className="font-medium">If automation stalls</h3>
+        <h3 className="text-xl">If automation stalls</h3>
         <ul className="mt-2 list-disc space-y-1 pl-5 text-fg-muted">
           <li>Missed deadline: the reactive contract re-requests the expiry check every 5 minutes until the vault confirms. After 30 minutes anyone can press “Run fallback manually” on the task page.</li>
           <li>Milestone not paid: the verifier can attest again after a 5-minute cooldown, or the owner can use the clearly labelled owner override.</li>

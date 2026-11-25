@@ -126,7 +126,7 @@ function Detail({ t }: { t: T }) {
             <ul className="space-y-2 p-5 text-sm leading-relaxed">
               {sentences.map((s, i) => (
                 <li key={i} className="flex gap-3">
-                  <span className="mt-2 size-1.5 shrink-0 rounded-full bg-accent" aria-hidden />
+                  <span className="mt-2 size-1.5 shrink-0 rounded-full bg-fg-subtle" aria-hidden />
                   {s}
                 </li>
               ))}
@@ -253,7 +253,7 @@ function Milestones({ t, verifierOf, isOwner }: { t: T; verifierOf: number[]; is
                 )}
               </div>
               {confirmIdx === i && (
-                <div className="w-full rounded-md border border-warning/40 bg-warning-soft p-3 text-[13px] sm:basis-full" role="alertdialog" aria-label="Confirm owner override">
+                <div className="w-full rounded-xl border border-warning/40 bg-warning-soft p-3 text-[13px] sm:basis-full" role="alertdialog" aria-label="Confirm owner override">
                   <div className="font-medium text-warning">Pay checkpoint {i + 1} without the verifier?</div>
                   <ul className="mt-1.5 list-disc space-y-0.5 pl-5 text-fg-muted">
                     <li>

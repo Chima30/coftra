@@ -6,16 +6,16 @@ import type { Tone } from "@/lib/protocol";
 /* Small shadcn-style primitives (cva + Tailwind), kept local to avoid a heavy component dependency. */
 
 export const buttonStyles = cva(
-  "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 whitespace-nowrap",
+  "inline-flex items-center justify-center gap-2 rounded-full text-[13px] font-medium tracking-tight transition-colors disabled:pointer-events-none disabled:opacity-45 whitespace-nowrap",
   {
     variants: {
       variant: {
-        primary: "bg-accent text-accent-fg hover:opacity-90",
-        secondary: "border border-border-strong bg-surface text-fg hover:bg-surface-2",
+        primary: "bg-accent text-accent-fg hover:bg-accent/90",
+        secondary: "border border-fg/80 bg-transparent text-fg hover:bg-fg hover:text-bg",
         ghost: "text-fg-muted hover:bg-surface-2 hover:text-fg",
         danger: "border border-danger/40 bg-danger-soft text-danger hover:bg-danger/10",
       },
-      size: { sm: "h-8 px-3", md: "h-10 px-4", lg: "h-11 px-5 text-[15px]" },
+      size: { sm: "h-9 px-4", md: "h-11 px-5", lg: "h-12 px-7 text-sm" },
     },
     defaultVariants: { variant: "primary", size: "md" },
   },
@@ -31,7 +31,7 @@ export function Button({
 }
 
 export function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("rounded-lg border border-border bg-surface", className)} {...props} />;
+  return <div className={cn("rounded-3xl border border-border bg-surface", className)} {...props} />;
 }
 
 export function CardHeader({
@@ -46,10 +46,10 @@ export function CardHeader({
   className?: string;
 }) {
   return (
-    <div className={cn("flex items-start justify-between gap-4 border-b border-border px-5 py-4", className)}>
+    <div className={cn("flex flex-wrap items-start justify-between gap-x-4 gap-y-3 border-b border-border px-5 py-4 sm:px-6 sm:py-5", className)}>
       <div className="min-w-0">
-        <h2 className="text-[15px] font-semibold text-fg">{title}</h2>
-        {description && <p className="mt-0.5 text-sm text-fg-muted">{description}</p>}
+        <h2 className="text-[22px] text-fg">{title}</h2>
+        {description && <p className="mt-1 max-w-2xl text-[13px] leading-relaxed text-fg-muted">{description}</p>}
       </div>
       {action}
     </div>
@@ -67,7 +67,7 @@ const toneStyles: Record<Tone, string> = {
 
 export function Badge({ tone = "neutral", className, children }: { tone?: Tone; className?: string; children: React.ReactNode }) {
   return (
-    <span className={cn("inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs font-medium", toneStyles[tone], className)}>
+    <span className={cn("inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-medium tracking-wide", toneStyles[tone], className)}>
       {children}
     </span>
   );
@@ -88,7 +88,7 @@ export function Field({
 }) {
   return (
     <div className="space-y-1.5">
-      <label htmlFor={htmlFor} className="block text-sm font-medium text-fg">
+      <label htmlFor={htmlFor} className="block text-[13px] font-medium text-fg">
         {label}
       </label>
       {children}
@@ -105,7 +105,7 @@ export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttribute
     <input
       ref={ref}
       className={cn(
-        "h-10 w-full rounded-md border border-border-strong bg-surface px-3 text-sm text-fg placeholder:text-fg-subtle focus-visible:outline-2",
+        "h-11 w-full rounded-2xl border border-border-strong bg-surface px-4 text-[13px] text-fg placeholder:text-fg-subtle focus-visible:outline-2 disabled:opacity-60",
         className,
       )}
       {...props}
@@ -117,19 +117,19 @@ export function Stat({ label, value, sub }: { label: string; value: React.ReactN
   return (
     <div className="min-w-0">
       <div className="text-xs text-fg-muted">{label}</div>
-      <div className="tabular mt-1 truncate text-xl font-semibold text-fg">{value}</div>
+      <div className="tabular mt-1.5 truncate text-xl font-medium tracking-tight text-fg">{value}</div>
       {sub && <div className="mt-0.5 text-xs text-fg-subtle">{sub}</div>}
     </div>
   );
 }
 
 export function Skeleton({ className }: { className?: string }) {
-  return <div className={cn("animate-pulse rounded-md bg-surface-2", className)} />;
+  return <div className={cn("animate-pulse rounded-2xl bg-surface-2", className)} />;
 }
 
 export function Notice({ tone = "info", title, children }: { tone?: Tone; title: string; children?: React.ReactNode }) {
   return (
-    <div className={cn("rounded-lg border px-4 py-3 text-sm", toneStyles[tone])} role={tone === "danger" ? "alert" : "status"}>
+    <div className={cn("rounded-2xl border px-4 py-3 text-[13px]", toneStyles[tone])} role={tone === "danger" ? "alert" : "status"}>
       <div className="font-medium">{title}</div>
       {children && <div className="mt-1 text-[13px] leading-relaxed opacity-90">{children}</div>}
     </div>

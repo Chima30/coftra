@@ -120,7 +120,7 @@ export function FirstAutomationGuide({ compact = false }: { compact?: boolean })
     <Card className="p-5" role="region" aria-label="Your first automation">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h2 className="text-[15px] font-semibold">Your first automation</h2>
+          <h2 className="text-xl">Your first automation</h2>
           <p className="text-sm text-fg-muted">
             {done} of {steps.length} done · ticked from your wallet and the chain, nothing stored
           </p>
@@ -130,7 +130,7 @@ export function FirstAutomationGuide({ compact = false }: { compact?: boolean })
         </Button>
       </div>
       <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-surface-2" aria-hidden>
-        <div className="h-full bg-accent" style={{ width: `${(done / steps.length) * 100}%` }} />
+        <div className="h-full bg-fg" style={{ width: `${(done / steps.length) * 100}%` }} />
       </div>
       <ol className="mt-4 space-y-3">
         {visible.map((s) => {
@@ -141,7 +141,7 @@ export function FirstAutomationGuide({ compact = false }: { compact?: boolean })
               <span
                 className={cn(
                   "mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border text-[11px]",
-                  s.done ? "border-accent bg-accent text-accent-fg" : isCurrent ? "border-accent text-accent" : "border-border-strong text-fg-subtle",
+                  s.done ? "border-success bg-success-soft text-success" : isCurrent ? "border-fg text-fg" : "border-border-strong text-fg-subtle",
                 )}
               >
                 {s.done ? <Check className="size-3" /> : i + 1}

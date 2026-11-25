@@ -36,7 +36,7 @@ export function AutomationReplay({ initial = "checkpoint" }: { initial?: string 
       <div className="border-b border-border px-5 py-4">
         <div className="flex flex-wrap items-center gap-2">
           <History className="size-4 text-accent" />
-          <h2 className="text-[15px] font-semibold">Replay a verified automation</h2>
+          <h2 className="text-xl">Replay a verified automation</h2>
           <Badge>Recorded testnet run · 17 Nov 2026</Badge>
         </div>
         <p className="mt-1 text-sm text-fg-muted">
@@ -54,7 +54,7 @@ export function AutomationReplay({ initial = "checkpoint" }: { initial?: string 
               }}
               className={cn(
                 "rounded-full border px-3 py-1 text-sm",
-                x.id === s.id ? "border-accent bg-accent-soft text-accent" : "border-border text-fg-muted hover:text-fg",
+                x.id === s.id ? "border-fg bg-fg text-bg" : "border-border text-fg-muted hover:border-fg/40 hover:text-fg",
               )}
             >
               {tabLabel(x.id, x.engine)}
@@ -72,8 +72,8 @@ export function AutomationReplay({ initial = "checkpoint" }: { initial?: string 
                   onClick={() => setStep(i)}
                   aria-current={i === step ? "step" : undefined}
                   className={cn(
-                    "w-full rounded-md border px-2 py-1.5 text-xs",
-                    i === step ? "border-accent bg-accent-soft font-medium text-accent" : i < step ? "border-border text-fg" : "border-border text-fg-subtle",
+                    "w-full rounded-xl border px-2 py-1.5 text-xs",
+                    i === step ? "border-fg bg-fg text-bg" : i < step ? "border-border text-fg" : "border-border text-fg-subtle",
                   )}
                 >
                   {i + 1}. {label}
@@ -128,7 +128,7 @@ export function AutomationReplay({ initial = "checkpoint" }: { initial?: string 
           </div>
         </div>
 
-        <div className="rounded-md border border-border bg-surface-2 p-4">
+        <div className="rounded-xl border border-border bg-surface-2 p-4">
           <div className="text-xs font-medium uppercase tracking-wide text-fg-subtle">{step === 0 ? "State before" : "State after this step"}</div>
           <dl className="mt-2 space-y-1.5 text-[13px]">
             {rows.map((r, i) => {

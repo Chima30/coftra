@@ -15,7 +15,7 @@ export default function Page() {
       <div className="mb-6">
         <VerifiedShowcase />
       </div>
-      <h2 className="mb-3 text-[15px] font-semibold">All callbacks, live from the chain</h2>
+      <h2 className="mb-3 text-xl">All callbacks, live from the chain</h2>
       <Suspense>
         <ActivityView />
       </Suspense>

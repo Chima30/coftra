@@ -40,13 +40,13 @@ export function IncomingCard({ t, me, linked = true, title }: { t: TaskView; me:
         </div>
       </div>
       <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-surface-2" aria-hidden>
-        <div className="h-full bg-accent" style={{ width: `${pct}%` }} />
+        <div className="h-full bg-fg" style={{ width: `${pct}%` }} />
       </div>
       <p className="mt-2 text-sm text-fg-muted">{inc.status}</p>
     </>
   );
   return linked ? (
-    <Link href={`/tasks/${t.id}`} className="block rounded-lg border border-border bg-surface p-5 transition-colors hover:border-border-strong">
+    <Link href={`/tasks/${t.id}`} className="block rounded-3xl border border-border bg-surface p-5 transition-colors hover:border-border-strong">
       {body}
     </Link>
   ) : (
@@ -60,7 +60,7 @@ export function AllowanceCard({ t, me }: { t: TaskView; me: string }) {
   const a = allowanceFor(t, me, (x) => nameOf(contacts, x) ?? shortHex(x));
   if (!a) return null;
   return (
-    <Link href={`/tasks/${t.id}`} className="block rounded-lg border border-border bg-surface p-5 transition-colors hover:border-border-strong">
+    <Link href={`/tasks/${t.id}`} className="block rounded-3xl border border-border bg-surface p-5 transition-colors hover:border-border-strong">
       <div className="flex flex-wrap items-center gap-2">
         <KeyRound className="size-4 text-accent" />
         <span className="font-medium">Task #{t.id.toString()}</span>

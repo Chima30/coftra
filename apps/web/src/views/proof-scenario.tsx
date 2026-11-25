@@ -44,7 +44,7 @@ export function ScenarioDetailView({ id }: { id: string }) {
       <ScenarioCard s={s} />
       <Card>
         <div className="border-b border-border px-5 py-3">
-          <h2 className="text-[15px] font-semibold">Asset movements</h2>
+          <h2 className="text-xl">Asset movements</h2>
           <p className="text-sm text-fg-muted">Every token and NFT that moved in this loop, from the transaction receipts.</p>
         </div>
         <div className="overflow-x-auto">

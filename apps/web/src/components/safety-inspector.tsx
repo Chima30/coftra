@@ -20,20 +20,23 @@ export function SafetyInspector({ findings }: { findings: Finding[] }) {
       />
       <ul className="divide-y divide-border">
         {[...warnings, ...notes].map((f) => (
-          <li key={f.title} className="flex gap-3 px-5 py-3 text-sm">
+          <li key={f.title} className="flex gap-3 px-5 py-3.5 text-[13px] sm:px-6">
             {f.level === "warning" ? (
               <AlertTriangle className="mt-0.5 size-4 shrink-0 text-warning" aria-label="Warning" />
             ) : (
               <Info className="mt-0.5 size-4 shrink-0 text-fg-subtle" aria-label="Note" />
             )}
             <div>
-              <div className={f.level === "warning" ? "font-medium text-warning" : "font-medium"}>{f.title}</div>
+              <div className={f.level === "warning" ? "font-medium text-warning" : "font-medium"}>
+                {f.level === "warning" && <span className="sr-only">Warning: </span>}
+                {f.title}
+              </div>
               <p className="mt-0.5 text-[13px] text-fg-muted">{f.detail}</p>
             </div>
           </li>
         ))}
       </ul>
-      <p className="border-t border-border px-5 py-3 text-xs text-fg-subtle">
+      <p className="border-t border-border px-5 py-3.5 text-xs leading-relaxed text-fg-subtle sm:px-6">
         These checks catch common configuration mistakes. They can&apos;t tell whether your verifier, recipient or executor is trustworthy, and Coftra
         is unaudited testnet software.
       </p>

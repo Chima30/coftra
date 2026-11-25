@@ -25,7 +25,7 @@ function Step({ s, last }: { s: ProofStep; last: boolean }) {
       {!last && <span className="absolute left-[9px] top-6 h-[calc(100%-12px)] w-px bg-border" aria-hidden />}
       <div className="pb-6">
         <div className="flex flex-wrap items-center gap-2">
-          <h4 className="text-sm font-medium text-fg">{s.title}</h4>
+          <h4 className="text-lg text-fg">{s.title}</h4>
           <Badge>{chainName(s.chainId)}</Badge>
           {s.status === "missing" && <Badge tone="info">Not found yet</Badge>}
         </div>
@@ -130,8 +130,8 @@ export function ProofView({ item }: { item: ActivityItem }) {
             ))}
           </ol>
           {proof.data.balanceChanges.length > 0 && (
-            <div className="mt-1 rounded-md border border-border p-4">
-              <h4 className="text-sm font-medium">Balance changes in the callback transaction</h4>
+            <div className="mt-1 rounded-xl border border-border p-4">
+              <h4 className="text-lg">Balance changes in the callback transaction</h4>
               <ul className="mt-2 space-y-1 text-[13px]">
                 {proof.data.balanceChanges.map((b, i) => (
                   <li key={i} className="flex flex-wrap items-center gap-x-2 text-fg-muted">

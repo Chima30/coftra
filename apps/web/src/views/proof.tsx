@@ -87,7 +87,7 @@ export function ProofView() {
           <CardHeader title="Why Reactive Network" description="What changes when nobody has to be online." />
           <div className="grid gap-4 p-5 md:grid-cols-3">
             {approaches.map((a, i) => (
-              <div key={a.name} className={i === 2 ? "rounded-md border border-accent/40 bg-accent-soft/40 p-4" : "rounded-md border border-border p-4"}>
+              <div key={a.name} className={i === 2 ? "rounded-2xl border border-fg/30 bg-surface-2 p-4" : "rounded-2xl border border-border p-4"}>
                 <div className="font-medium">{a.name}</div>
                 <p className="mt-1.5 text-sm text-fg-muted">{a.who}</p>
                 <p className="mt-2 text-sm text-fg-muted">
@@ -129,7 +129,7 @@ export function ProofView() {
                 </div>
               ))}
             </dl>
-            <div className="space-y-3 rounded-md border border-border bg-surface-2 p-4">
+            <div className="space-y-3 rounded-xl border border-border bg-surface-2 p-4">
               <div>
                 <div className="font-medium">Your task deposit is separate</div>
                 <p className="mt-1 text-fg-muted">

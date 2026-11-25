@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
+import { IBM_Plex_Mono, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 import { AppShell } from "@/components/app-shell";
 
-const sans = IBM_Plex_Sans({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-plex-sans" });
-const mono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-plex-mono" });
+// Open-source (OFL) pairing: an editorial serif for headings, a monospace for everything functional.
+const serif = Instrument_Serif({ subsets: ["latin"], weight: ["400"], variable: "--font-serif" });
+const mono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-plex-mono" });
 
 export const metadata: Metadata = {
   // Absolute base for canonical and Open Graph URLs. Override with NEXT_PUBLIC_SITE_URL on a custom domain.
@@ -18,11 +19,11 @@ export const metadata: Metadata = {
 };
 
 // Applies the saved theme before first paint. Preference only; nothing authoritative lives in storage.
-const themeScript = `try{var t=localStorage.getItem('coftra.theme');if(t==='dark'||(!t&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.classList.add('dark')}catch(e){}`;
+const themeScript = `try{var t=localStorage.getItem('coftra.theme');if(t==='dark')document.documentElement.classList.add('dark')}catch(e){}`;
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${sans.variable} ${mono.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${serif.variable} ${mono.variable}`} suppressHydrationWarning>
       {/* next/script injects this outside React's hydrated tree. A raw <script> in <head> was hydrated by
           React, and wallet extensions (MetaMask, Meteor, …) that inject their own <head> scripts caused
           hydration mismatches. */}

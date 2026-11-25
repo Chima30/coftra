@@ -82,7 +82,7 @@ export function ReserveTopUp() {
             Current reserve covers ≈ <span className="font-medium text-fg">{assessment.runwayHoursWhileOpen.toFixed(1)} h</span> of automation while tasks are open.
           </p>
         )}
-        <div className="rounded-md border border-warning/40 bg-warning-soft p-3 text-[13px]">
+        <div className="rounded-xl border border-warning/40 bg-warning-soft p-3 text-[13px]">
           <div className="font-medium text-warning">Not a deposit</div>
           <p className="mt-1 text-fg-muted">
             lREACT sent here is consumed as automation runs. It can&apos;t be withdrawn, isn&apos;t credited to you or any task, and doesn&apos;t touch task

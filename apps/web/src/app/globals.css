@@ -2,51 +2,68 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Light: paper and ink. Dark: deep navy and charcoal. One accent, used sparingly. */
+/*
+ * Editorial palette. Parchment is the page; off-black is the ink; Lake Blue is kept for actions.
+ * Pastels (periwinkle, sky, mint, coral, gold) are for illustration and soft status fills only.
+ * Status colours are darkened from the pastels so text on them passes WCAG AA.
+ */
 :root {
-  --bg: #f6f7f9;
-  --surface: #ffffff;
-  --surface-2: #f0f2f5;
-  --border: #e1e5eb;
-  --border-strong: #c9d0da;
-  --fg: #0f1a2b;
-  --fg-muted: #556377;
-  --fg-subtle: #7d8899;
-  --accent: #0f766e;
+  --parchment: #f6f3f1;
+  --off-black: #242424;
+  --graphite: #4e4d4d;
+  --smoke: #797776;
+  --ash: #cecac8;
+  --lake: #2b59d1;
+  --periwinkle: #cfdaf5;
+  --sky: #a0b5eb;
+  --mint: #a7fccd;
+  --coral: #ff9473;
+  --gold: #ecda98;
+
+  --bg: var(--parchment);
+  --surface: #fbf9f8;
+  --surface-2: #efebe8;
+  --border: #e2dedb;
+  --border-strong: var(--ash);
+  --fg: var(--off-black);
+  --fg-muted: var(--graphite);
+  --fg-subtle: #6b6968; /* smoke, nudged darker for 4.5:1 on parchment */
+  --accent: var(--lake);
   --accent-fg: #ffffff;
-  --accent-soft: #e3f3f1;
-  --success: #15803d;
-  --success-soft: #e6f4ea;
-  --warning: #b45309;
-  --warning-soft: #fdf3e2;
-  --danger: #b91c1c;
-  --danger-soft: #fbeaea;
-  --info: #1d4ed8;
-  --info-soft: #e8eefc;
-  --ring: #0f766e;
+  --accent-soft: #e4eafa;
+  --success: #17703f;
+  --success-soft: #e2f8ec;
+  --warning: #855d00;
+  --warning-soft: #f8f0d2;
+  --danger: #b3361b;
+  --danger-soft: #ffe7de;
+  --info: var(--lake);
+  --info-soft: #e4eafa;
+  --ring: var(--lake);
 }
 
+/* Opt-in night reading (Settings). Warm graphite, never navy, so it stays the same product. */
 .dark {
-  --bg: #0b1220;
-  --surface: #111a2b;
-  --surface-2: #162236;
-  --border: #1f2c42;
-  --border-strong: #2b3b56;
-  --fg: #e6ebf2;
-  --fg-muted: #9aa7ba;
-  --fg-subtle: #6c7a90;
-  --accent: #2dd4bf;
-  --accent-fg: #062521;
-  --accent-soft: #0f2e2e;
-  --success: #4ade80;
-  --success-soft: #11291c;
-  --warning: #fbbf24;
-  --warning-soft: #2c2210;
-  --danger: #f87171;
-  --danger-soft: #2e1515;
-  --info: #93b4fd;
-  --info-soft: #152442;
-  --ring: #2dd4bf;
+  --bg: #1d1c1b;
+  --surface: #252423;
+  --surface-2: #2e2d2b;
+  --border: #383634;
+  --border-strong: #4a4846;
+  --fg: #f1edea;
+  --fg-muted: #c4bfbb;
+  --fg-subtle: #9a9592;
+  --accent: #8ea8ef;
+  --accent-fg: #14161c;
+  --accent-soft: #262d40;
+  --success: #7fe3ad;
+  --success-soft: #1c2b23;
+  --warning: #e6cf7c;
+  --warning-soft: #2e2a1a;
+  --danger: #ff9f82;
+  --danger-soft: #35221c;
+  --info: #8ea8ef;
+  --info-soft: #262d40;
+  --ring: #8ea8ef;
 }
 
 @theme inline {
@@ -70,8 +87,14 @@
   --color-info: var(--info);
   --color-info-soft: var(--info-soft);
   --color-ring: var(--ring);
-  --font-sans: var(--font-plex-sans);
+  --color-periwinkle: var(--periwinkle);
+  --color-sky: var(--sky);
+  --color-mint: var(--mint);
+  --color-coral: var(--coral);
+  --color-gold: var(--gold);
+  --font-sans: var(--font-plex-mono);
   --font-mono: var(--font-plex-mono);
+  --font-display: var(--font-serif);
 }
 
 html {
@@ -84,14 +107,61 @@ html.dark {
 body {
   background: var(--bg);
   color: var(--fg);
-  font-family: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-plex-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 14px;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Editorial serif for headings, always regular weight. */
+h1,
+h2,
+h3,
+.font-display {
+  font-family: var(--font-serif), Georgia, "Times New Roman", serif;
+  font-weight: 400;
+  letter-spacing: -0.012em;
+  line-height: 1.15;
 }
 
 :focus-visible {
   outline: 2px solid var(--ring);
   outline-offset: 2px;
-  border-radius: 4px;
+  border-radius: 6px;
+}
+
+/* Soft pastel atmosphere behind hero areas. Decorative only; hidden from assistive tech by its markup. */
+.atmosphere {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  border-radius: inherit;
+}
+.atmosphere::before,
+.atmosphere::after {
+  content: "";
+  position: absolute;
+  width: 46%;
+  aspect-ratio: 1;
+  border-radius: 9999px;
+  filter: blur(70px);
+  opacity: 0.55;
+}
+.atmosphere::before {
+  background: var(--periwinkle);
+  top: -30%;
+  right: -8%;
+}
+.atmosphere::after {
+  background: var(--mint);
+  bottom: -40%;
+  right: 22%;
+  opacity: 0.35;
+}
+.dark .atmosphere::before,
+.dark .atmosphere::after {
+  opacity: 0.12;
 }
 
 .tabular {
@@ -129,4 +199,21 @@ body {
     inset: 0 0 auto 0;
     border: 0;
   }
+}
+
+/* Automation pipeline (homepage illustration): hub pulse when an event arrives. */
+@keyframes coftra-pulse {
+  from {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  to {
+    transform: scale(1.45);
+    opacity: 0;
+  }
+}
+.pipeline-pulse {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: coftra-pulse 900ms ease-out forwards;
 }

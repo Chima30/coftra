@@ -115,7 +115,7 @@ function TopUp() {
         description="Pays for future Reactive callbacks on Base Sepolia. Most people never need this."
       />
       <div className="space-y-4 p-5">
-        <div className="rounded-md border border-warning/40 bg-warning-soft p-3 text-[13px]">
+        <div className="rounded-xl border border-warning/40 bg-warning-soft p-3 text-[13px]">
           <div className="font-medium text-warning">This is not a task deposit</div>
           <ul className="mt-1 list-disc space-y-0.5 pl-5 text-fg-muted">
             <li>ETH sent here becomes protocol operating funds. It is spent as callbacks run, for every user&apos;s tasks.</li>

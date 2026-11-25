@@ -56,7 +56,7 @@ export function DeadlineCountdown({ taskId, deadline, state, label }: { taskId: 
   if (!open || now === 0) return null;
   const left = deadline - now;
   return (
-    <div className="space-y-2 rounded-md border border-border p-3">
+    <div className="space-y-2 rounded-xl border border-border p-3">
       <div className="flex items-center gap-2">
         <Timer className="size-4 text-fg-subtle" />
         <span className="text-fg-muted">Deadline</span>
