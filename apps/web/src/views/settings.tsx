@@ -5,6 +5,7 @@ import { useAccount, useBalance, useSwitchChain } from "wagmi";
 import { parseEther } from "viem";
 import { PageHeader, ThemeToggle } from "@/components/app-shell";
 import { FundingDetail } from "@/components/funding";
+import { ContactsCard } from "@/components/contacts-card";
 import { ReserveTopUp } from "@/components/reserve-topup";
 import { Hex } from "@/components/hex";
 import { NotDeployed } from "@/components/states";
@@ -50,6 +51,7 @@ export function SettingsView() {
               ))}
             </dl>
           </Card>
+          <ContactsCard />
           <RecentSubmissions />
           <Card>
             <CardHeader title="Preferences" description="Stored only in this browser. Nothing about your tasks is." />

@@ -62,3 +62,35 @@ export function useFunding() {
     queryFn: () => readFundingHealth(d!),
   });
 }
+
+/**
+ * Open tasks where the connected address verifies a checkpoint. The vault doesn't index verifiers
+ * (only owners, recipients and executors), so this reads every task the logs show as activated and not
+ * yet closed, then keeps the ones naming this address as a verifier.
+ */
+export function useVerifierTasks(skip: ReadonlySet<string>) {
+  const { address } = useAccount();
+  const logs = useVaultLogs();
+  const d = deploymentInfo;
+  const open = (() => {
+    const activated = new Set<string>();
+    for (const l of logs.data ?? []) {
+      const id = (l.args as { taskId?: bigint }).taskId?.toString();
+      if (!id) continue;
+      if (l.eventName === "TaskActivated") activated.add(id);
+      if (l.eventName === "TaskClosed") activated.delete(id);
+    }
+    return [...activated].filter((id) => !skip.has(id)).sort();
+  })();
+  return useQuery({
+    queryKey: ["verifierTasks", address, open.join(",")],
+    enabled: !!d && !!address && !!logs.data,
+    refetchInterval: 30_000,
+    queryFn: async () => {
+      if (open.length === 0) return [];
+      const tasks = await readTasks(d!, open.map(BigInt));
+      const me = address!.toLowerCase();
+      return tasks.filter((t) => t.milestones.some((m) => m.verifier.toLowerCase() === me));
+    },
+  });
+}

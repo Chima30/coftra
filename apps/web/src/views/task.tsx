@@ -10,6 +10,8 @@ import { FundsBar, StateBadge } from "@/components/task-bits";
 import { TaskLabelEditor } from "@/components/task-label";
 import { IncomingCard } from "@/components/role-cards";
 import { TaskStory } from "@/components/task-story";
+import { RecipientWelcome } from "@/components/recipient-welcome";
+import { useSearchParams } from "next/navigation";
 import { DeadlineCountdown } from "@/components/deadline";
 import { ShareTaskButton } from "@/components/share";
 import { useTaskLabel } from "@/lib/labels";
@@ -52,6 +54,9 @@ function Detail({ t }: { t: T }) {
   const me = address?.toLowerCase();
   const isOwner = me === t.task.owner.toLowerCase();
   const isExecutor = kind === TaskKind.SpendingSession && me === t.session.executor.toLowerCase();
+  const isRecipient = kind === TaskKind.ProjectBudget && me === t.task.recipient.toLowerCase();
+  // Opened from the owner's "link for the recipient": explain the page from the recipient's side.
+  const recipientView = useSearchParams().get("for") === "recipient" && kind === TaskKind.ProjectBudget && !isOwner;
   const verifierOf = t.milestones.map((m, i) => (me === m.verifier.toLowerCase() ? i : -1)).filter((i) => i >= 0);
 
   const sentences = useMemo(
@@ -101,6 +106,7 @@ function Detail({ t }: { t: T }) {
       />
       <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
         <div className="min-w-0 space-y-6">
+          {recipientView && <RecipientWelcome t={t} viewerIsRecipient={isRecipient} />}
           {address && <IncomingCard t={t} me={address} linked={false} />}
           <Card>
             <div className="grid grid-cols-2 gap-5 p-5 md:grid-cols-4">
@@ -145,7 +151,7 @@ function Detail({ t }: { t: T }) {
 
           {kind === TaskKind.ProjectBudget ? <Milestones t={t} verifierOf={verifierOf} isOwner={isOwner} /> : <SessionPanel t={t} isExecutor={isExecutor} />}
 
-          <TaskStory t={t} label={label || undefined} />
+          <TaskStory t={t} label={label || undefined} viewer={recipientView ? t.task.recipient : undefined} />
 
           <Timeline id={t.id} />
         </div>
@@ -441,7 +447,7 @@ function Actions({ t, isOwner }: { t: T; isOwner: boolean }) {
           </div>
         )}
         {isTerminal(state) && <p className="text-fg-muted">This task is final. Nothing can reopen it or move its funds again.</p>}
-        <ShareTaskButton taskId={t.id} />
+        <ShareTaskButton taskId={t.id} forRecipient={t.task.kind === TaskKind.ProjectBudget} />
         {!isOwner && !isTerminal(state) && state !== TaskState.Active && <p className="text-fg-muted">Only the owner can act on this task.</p>}
         <TxStatusLine status={tx.status} hash={tx.hash} error={tx.error} slow={tx.slow} />
       </div>

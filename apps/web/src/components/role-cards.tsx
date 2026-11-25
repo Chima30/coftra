@@ -4,22 +4,24 @@ import Link from "next/link";
 import { ArrowDownToLine, KeyRound } from "lucide-react";
 import type { TaskView } from "@/lib/reads";
 import { allowanceFor, incomingFor } from "@/lib/roles";
-import { fmtToken } from "@/lib/format";
+import { fmtToken, shortHex } from "@/lib/format";
+import { nameOf, useContacts } from "@/lib/contacts";
 import { StateBadge } from "./task-bits";
 import { TaskLabelText } from "./task-label";
 import { Card } from "./ui/primitives";
 import type { TaskState } from "@/lib/protocol";
 
 /** A project budget seen from the recipient's side. */
-export function IncomingCard({ t, me, linked = true }: { t: TaskView; me: string; linked?: boolean }) {
-  const inc = incomingFor(t, me);
+export function IncomingCard({ t, me, linked = true, title }: { t: TaskView; me: string; linked?: boolean; title?: string }) {
+  const contacts = useContacts();
+  const inc = incomingFor(t, me, (a) => nameOf(contacts, a) ?? shortHex(a));
   if (!inc) return null;
   const pct = inc.promised > 0n ? Number((inc.paid * 100n) / inc.promised) : 0;
   const body = (
     <>
       <div className="flex flex-wrap items-center gap-2">
         <ArrowDownToLine className="size-4 text-accent" />
-        <span className="font-medium">{linked ? `Task #${t.id}` : "You're the recipient"}</span>
+        <span className="font-medium">{linked ? `Task #${t.id}` : (title ?? "You're the recipient")}</span>
         {linked && <TaskLabelText taskId={t.id} />}
         <StateBadge state={t.task.state as TaskState} />
       </div>
@@ -54,7 +56,8 @@ export function IncomingCard({ t, me, linked = true }: { t: TaskView; me: string
 
 /** A spending session seen from the executor's side. */
 export function AllowanceCard({ t, me }: { t: TaskView; me: string }) {
-  const a = allowanceFor(t, me);
+  const contacts = useContacts();
+  const a = allowanceFor(t, me, (x) => nameOf(contacts, x) ?? shortHex(x));
   if (!a) return null;
   return (
     <Link href={`/tasks/${t.id}`} className="block rounded-lg border border-border bg-surface p-5 transition-colors hover:border-border-strong">

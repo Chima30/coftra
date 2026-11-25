@@ -128,10 +128,10 @@ export function taskStory(t: TaskLike, logs: readonly StoryLog[], me?: string, l
 
 const csvCell = (v: string) => (/[",\n\r]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v);
 
-/** One row per story step, ready to save as a .csv receipt. Amounts are exact decimals, not rounded. */
-export function receiptCsv(t: TaskLike, steps: readonly StoryStep[], explorerTx: (hash: string) => string): string {
-  const head = ["task", "step", "what happened", "event", `amount (${TOKEN_SYMBOL})`, "by", "block", "transaction", "explorer"];
-  const rows = steps.map((s, i) => [
+const HEAD = ["task", "step", "what happened", "event", `amount (${TOKEN_SYMBOL})`, "by", "block", "transaction", "explorer"];
+
+function rows(t: TaskLike, steps: readonly StoryStep[], explorerTx: (hash: string) => string): string[][] {
+  return steps.map((s, i) => [
     t.id.toString(),
     String(i + 1),
     s.text,
@@ -142,5 +142,17 @@ export function receiptCsv(t: TaskLike, steps: readonly StoryStep[], explorerTx:
     s.tx,
     explorerTx(s.tx),
   ]);
-  return [head, ...rows].map((r) => r.map(csvCell).join(",")).join("\r\n") + "\r\n";
+}
+
+const toCsv = (table: string[][]) => table.map((r) => r.map(csvCell).join(",")).join("\r\n") + "\r\n";
+
+/** One row per story step, ready to save as a .csv receipt. Amounts are exact decimals, not rounded. */
+export function receiptCsv(t: TaskLike, steps: readonly StoryStep[], explorerTx: (hash: string) => string): string {
+  return receiptsCsv([{ t, steps }], explorerTx);
+}
+
+/** Several tasks in one file, same columns, ordered by task id. For bookkeeping across everything you run. */
+export function receiptsCsv(entries: readonly { t: TaskLike; steps: readonly StoryStep[] }[], explorerTx: (hash: string) => string): string {
+  const sorted = [...entries].sort((a, b) => (a.t.id < b.t.id ? -1 : a.t.id > b.t.id ? 1 : 0));
+  return toCsv([HEAD, ...sorted.flatMap((e) => rows(e.t, e.steps, explorerTx))]);
 }

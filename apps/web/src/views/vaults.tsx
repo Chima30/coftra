@@ -10,6 +10,7 @@ import { useMyTasks } from "@/hooks/use-coftra";
 import { useAccount } from "wagmi";
 import { allowanceFor, incomingFor } from "@/lib/roles";
 import { AllowanceCard, IncomingCard } from "@/components/role-cards";
+import { ExportAllButton } from "@/components/task-story";
 import { cn } from "@/lib/format";
 import { TaskState } from "@/lib/protocol";
 
@@ -48,6 +49,7 @@ function List() {
   if (error) return <ErrorState error={error} retry={() => refetch()} />;
   return (
     <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
       <div className="flex flex-wrap gap-1.5" role="tablist" aria-label="Filter tasks">
         {tabs.map((t) => (
           <button
@@ -63,6 +65,8 @@ function List() {
             {t}
           </button>
         ))}
+      </div>
+      <ExportAllButton tasks={data?.tasks ?? []} />
       </div>
       {isLoading ? (
         <Skeleton className="h-40" />

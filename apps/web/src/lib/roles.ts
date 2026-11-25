@@ -30,7 +30,7 @@ export type Incoming = {
 };
 
 /** What a project budget means for its recipient. Null if `me` isn't the recipient. */
-export function incomingFor(t: TaskLike, me: string): Incoming | null {
+export function incomingFor(t: TaskLike, me: string, name: (a: string) => string = (a) => shortHex(a)): Incoming | null {
   if (t.task.kind !== TaskKind.ProjectBudget || !eq(t.task.recipient, me)) return null;
   const promised = t.milestones.reduce((s, m) => s + m.amount, 0n);
   const paid = t.milestones.filter((m) => m.done).reduce((s, m) => s + m.amount, 0n);
@@ -44,7 +44,7 @@ export function incomingFor(t: TaskLike, me: string): Incoming | null {
   else if (state === TaskState.Cancelled) status = "Cancelled by the owner before it started.";
   else if (state === TaskState.Funded) status = "Funded but not started yet. The owner still has to activate it.";
   else if (next)
-    status = `Next: ${fmtToken(next.amount)} when ${shortHex(next.verifier)} confirms checkpoint ${next.index + 1}, before ${fmtDate(t.task.deadline)}.`;
+    status = `Next: ${fmtToken(next.amount)} when ${name(next.verifier)} confirms checkpoint ${next.index + 1}, before ${fmtDate(t.task.deadline)}.`;
   else status = "All checkpoints confirmed.";
   return { promised, paid, remaining: promised - paid, status, next };
 }
@@ -52,12 +52,12 @@ export function incomingFor(t: TaskLike, me: string): Incoming | null {
 export type Allowance = { canSpend: boolean; left: bigint; status: string };
 
 /** What a spending session means for its executor. Null if `me` isn't the executor. */
-export function allowanceFor(t: TaskLike, me: string): Allowance | null {
+export function allowanceFor(t: TaskLike, me: string, name: (a: string) => string = (a) => shortHex(a)): Allowance | null {
   if (t.task.kind !== TaskKind.SpendingSession || !eq(t.session.executor, me)) return null;
   const left = t.session.spendCap - t.session.spent;
   const open = t.task.state === TaskState.Active && t.session.executorActive;
   const status = open
-    ? `You may spend up to ${fmtToken(left)} more, only on ${shortHex(t.session.target)}, until ${fmtDate(t.task.deadline)}.`
+    ? `You may spend up to ${fmtToken(left)} more, only on ${name(t.session.target)}, until ${fmtDate(t.task.deadline)}.`
     : t.task.state === TaskState.Completed
       ? `Job done: you spent ${fmtToken(t.session.spent)} and your access was removed automatically.`
       : "Your access has ended.";

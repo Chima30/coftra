@@ -5,29 +5,26 @@ import { useAccount } from "wagmi";
 import { Download, Printer, Zap } from "lucide-react";
 import type { TaskView } from "@/lib/reads";
 import { useVaultLogs } from "@/hooks/use-coftra";
-import { receiptCsv, taskStory, type StoryLog } from "@/lib/story";
+import { useContacts } from "@/lib/contacts";
+import { receiptCsv, receiptsCsv, taskStory, type StoryLog } from "@/lib/story";
 import { destination, explorerTx } from "@/lib/chains";
 import { kindLabel, stateCopy, type TaskKind, type TaskState } from "@/lib/protocol";
 import { Hex } from "./hex";
 import { Button, Card, CardHeader, Skeleton } from "./ui/primitives";
 
 /** The task's history told as everyday sentences, with a CSV download and a printable receipt. */
-export function TaskStory({ t, label }: { t: TaskView; label?: string }) {
+export function TaskStory({ t, label, viewer }: { t: TaskView; label?: string; viewer?: string }) {
   const logs = useVaultLogs();
   const { address } = useAccount();
+  const contacts = useContacts();
+  const me = viewer ?? address;
   const steps = useMemo(
-    () => taskStory(t, (logs.data ?? []) as unknown as StoryLog[], address),
-    [t, logs.data, address],
+    () => taskStory(t, (logs.data ?? []) as unknown as StoryLog[], me, contacts),
+    [t, logs.data, me, contacts],
   );
 
   function download() {
-    const csv = receiptCsv(t, steps, (h) => explorerTx(destination.id, h));
-    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `coftra-task-${t.id}-receipt.csv`;
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    downloadCsv(`coftra-task-${t.id}-receipt.csv`, receiptCsv(t, steps, (h) => explorerTx(destination.id, h)));
   }
 
   function print() {
@@ -91,3 +88,38 @@ export function TaskStory({ t, label }: { t: TaskView; label?: string }) {
   );
 }
 
+
+function downloadCsv(filename: string, csv: string) {
+  const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+/** Every listed task's story in one CSV, for bookkeeping. */
+export function ExportAllButton({ tasks }: { tasks: readonly TaskView[] }) {
+  const logs = useVaultLogs();
+  const { address } = useAccount();
+  const contacts = useContacts();
+  const ready = !!logs.data && tasks.length > 0;
+  return (
+    <Button
+      variant="secondary"
+      size="sm"
+      disabled={!ready}
+      title={ready ? undefined : "Loading history…"}
+      onClick={() => {
+        const all = (logs.data ?? []) as unknown as StoryLog[];
+        const csv = receiptsCsv(
+          tasks.map((t) => ({ t, steps: taskStory(t, all, address, contacts) })),
+          (h) => explorerTx(destination.id, h),
+        );
+        downloadCsv(`coftra-tasks-${new Date().toISOString().slice(0, 10)}.csv`, csv);
+      }}
+    >
+      <Download className="size-4" /> Export all (CSV)
+    </Button>
+  );
+}

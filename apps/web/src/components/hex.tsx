@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Check, Copy, ExternalLink } from "lucide-react";
 import { explorerAddress, explorerTx } from "@/lib/chains";
 import { cn, shortHex } from "@/lib/format";
+import { useContactName } from "@/lib/contacts";
 
 export function CopyButton({ value, label = "Copy" }: { value: string; label?: string }) {
   const [done, setDone] = useState(false);
@@ -32,18 +33,23 @@ export function Hex({
   chainId,
   kind = "address",
   full = false,
+  plain = false,
   className,
 }: {
   value?: string;
   chainId?: number;
   kind?: "address" | "tx";
   full?: boolean;
+  /** Skip the contact name (e.g. when the name is already shown beside it). */
+  plain?: boolean;
   className?: string;
 }) {
+  const contact = useContactName(kind === "address" ? value : undefined);
   if (!value) return <span className="text-fg-subtle">—</span>;
   const href = chainId ? (kind === "tx" ? explorerTx(chainId, value) : explorerAddress(chainId, value)) : undefined;
   return (
     <span className={cn("inline-flex min-w-0 items-center gap-0.5 font-mono text-[13px]", className)}>
+      {contact && !plain && <span className="mr-1 font-sans font-medium text-fg">{contact}</span>}
       <span className={cn("truncate", full && "break-all whitespace-normal")} title={value}>
         {full ? value : shortHex(value, 6)}
       </span>

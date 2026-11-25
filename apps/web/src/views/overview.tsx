@@ -9,6 +9,7 @@ import { Card, CardHeader, Stat, Skeleton, buttonStyles } from "@/components/ui/
 import { TaskRow } from "@/components/task-bits";
 import { EmptyState, ErrorState, NotDeployed } from "@/components/states";
 import { FundingSummary } from "@/components/funding";
+import { NeedsYou } from "@/components/needs-you";
 import { RecentActivity } from "@/components/activity-feed";
 import { FirstAutomationGuide, ShowGuideLink } from "@/components/first-guide";
 import { deploymentInfo, useMyTasks } from "@/hooks/use-coftra";
@@ -168,7 +169,8 @@ function Dashboard() {
 
       <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
         <div className="space-y-3">
-          <div className="flex items-center justify-between">
+          <NeedsYou />
+          <div className="flex items-center justify-between pt-3">
             <h2 className="text-[15px] font-semibold">Your tasks</h2>
             <Link href="/vaults" className="text-sm text-accent hover:underline">View all</Link>
           </div>
