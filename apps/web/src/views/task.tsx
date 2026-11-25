@@ -7,6 +7,10 @@ import { ArrowLeft } from "lucide-react";
 import { encodeFunctionData } from "viem";
 import { PageHeader } from "@/components/app-shell";
 import { FundsBar, StateBadge } from "@/components/task-bits";
+import { TaskLabelEditor } from "@/components/task-label";
+import { DeadlineCountdown } from "@/components/deadline";
+import { ShareTaskButton } from "@/components/share";
+import { useTaskLabel } from "@/lib/labels";
 import { Hex } from "@/components/hex";
 import { EmptyState, ErrorState, NotDeployed } from "@/components/states";
 import { RecentActivity, useBlockTime } from "@/components/activity-feed";
@@ -83,6 +87,7 @@ function Detail({ t }: { t: T }) {
         title={`Task #${t.id}`}
         description={
           <span className="flex flex-wrap items-center gap-2">
+            <TaskLabelEditor taskId={t.id} />
             <StateBadge state={state} />
             <span>{kindLabel[kind]}</span>
             {roles.map((r) => (
@@ -349,6 +354,7 @@ function encodeMint(to: `0x${string}`) {
 
 function Actions({ t, isOwner }: { t: T; isOwner: boolean }) {
   const d = deploymentInfo!;
+  const [label] = useTaskLabel(t.id);
   const { address } = useAccount();
   const tx = useTx();
   const [newDeadline, setNewDeadline] = useState("");
@@ -368,6 +374,7 @@ function Actions({ t, isOwner }: { t: T; isOwner: boolean }) {
     <Card>
       <CardHeader title="Actions" description="Only what your role allows right now." />
       <div className="space-y-4 p-5 text-sm">
+        <DeadlineCountdown taskId={t.id} deadline={Number(t.task.deadline)} state={state} label={label} />
         {isOwner && state === TaskState.Funded && (
           <Button className="w-full" disabled={tx.busy} onClick={() => tx.run("Activate", { address: d.vault, abi: vaultAbi, functionName: "activate", args: [t.id] })}>
             Activate automation
@@ -426,6 +433,7 @@ function Actions({ t, isOwner }: { t: T; isOwner: boolean }) {
           </div>
         )}
         {isTerminal(state) && <p className="text-fg-muted">This task is final. Nothing can reopen it or move its funds again.</p>}
+        <ShareTaskButton taskId={t.id} />
         {!isOwner && !isTerminal(state) && state !== TaskState.Active && <p className="text-fg-muted">Only the owner can act on this task.</p>}
         <TxStatusLine status={tx.status} hash={tx.hash} error={tx.error} slow={tx.slow} />
       </div>

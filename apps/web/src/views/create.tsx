@@ -15,6 +15,7 @@ import { useFundingAssessment } from "@/components/funding";
 import { deploymentInfo } from "@/hooks/use-coftra";
 import { useTx } from "@/hooks/use-tx";
 import { useNow } from "@/hooks/use-now";
+import { saveTaskLabel } from "@/lib/labels";
 import { mockUsdcAbi, vaultAbi } from "@/lib/contracts";
 import { destination } from "@/lib/chains";
 import { cn, fmtDate, fmtToken, parseToken } from "@/lib/format";
@@ -24,6 +25,54 @@ import { maxSpend, ruleSentences, type RuleInput } from "@/lib/summary";
 const steps = ["Template", "Rules", "Deadline & fallback", "Review", "Fund & activate"] as const;
 
 type Milestone = { amount: string; verifier: string };
+
+type Preset =
+  | { id: string; title: string; body: string; label: string; kind: TaskKind.ProjectBudget; budget: string; milestones: string[]; durationSec: number }
+  | { id: string; title: string; body: string; label: string; kind: TaskKind.SpendingSession; budget: string; cap: string; durationSec: number };
+
+// Short deadlines on purpose: while any task is open the automation reserve is billed (see Funding Health).
+const PRESETS: Preset[] = [
+  {
+    id: "freelancer",
+    title: "Pay a freelancer in two stages",
+    body: "100 tUSDC: 30 after drafts, 50 after final files, 20 kept back. 1-hour deadline.",
+    label: "Freelancer, two stages",
+    kind: TaskKind.ProjectBudget,
+    budget: "100",
+    milestones: ["30", "50"],
+    durationSec: 3600,
+  },
+  {
+    id: "grant",
+    title: "Grant with three milestones",
+    body: "300 tUSDC split evenly across three verified milestones. 4-hour deadline.",
+    label: "Grant, three milestones",
+    kind: TaskKind.ProjectBudget,
+    budget: "300",
+    milestones: ["100", "100", "100"],
+    durationSec: 4 * 3600,
+  },
+  {
+    id: "bot-mint",
+    title: "Let a bot mint one NFT for me",
+    body: "40 tUSDC deposit, the bot may spend 25 on one mint to you; 15 comes back.",
+    label: "Bot mints one NFT",
+    kind: TaskKind.SpendingSession,
+    budget: "40",
+    cap: "25",
+    durationSec: 3600,
+  },
+  {
+    id: "fallback-demo",
+    title: "Watch FALLBACK refund itself",
+    body: "20 tUSDC, one checkpoint, 15-minute deadline. Don't attest; it expires and refunds by itself.",
+    label: "Fallback demo",
+    kind: TaskKind.ProjectBudget,
+    budget: "20",
+    milestones: ["10"],
+    durationSec: 15 * 60,
+  },
+];
 
 const MIN_LEAD_SECONDS = 5 * 60; // contract minimum is 2 min; leave room for wallet + inclusion
 
@@ -73,6 +122,7 @@ function Builder() {
   const [sessionBudget, setSessionBudget] = useState("40");
 
   // shared
+  const [taskLabel, setTaskLabel] = useState("");
   const [deadline, setDeadline] = useState(() => toLocalInput(Math.floor(Date.now() / 1000) + 30 * 60));
   const [refundTo, setRefundTo] = useState(address ?? "");
 
@@ -210,6 +260,51 @@ function Builder() {
           </div>
         )}
 
+        {step === 0 && (
+          <Card className="p-5">
+            <h2 className="text-[15px] font-semibold">Or start from a preset</h2>
+            <p className="mt-0.5 text-sm text-fg-muted">Fills in a typical setup; you can change every value before signing.</p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              {PRESETS.map((p) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => {
+                    const now = Math.floor(Date.now() / 1000);
+                    setKind(p.kind);
+                    setTaskLabel(p.label);
+                    setDeadline(toLocalInput(now + p.durationSec));
+                    if (p.kind === TaskKind.ProjectBudget) {
+                      setBudget(p.budget);
+                      setMilestones(p.milestones.map((amount) => ({ amount, verifier: address ?? "" })));
+                    } else {
+                      setSessionBudget(p.budget);
+                      setSpendCap(p.cap);
+                    }
+                    setStep(1);
+                  }}
+                  className="rounded-md border border-border p-3 text-left text-sm transition-colors hover:border-accent"
+                >
+                  <div className="font-medium">{p.title}</div>
+                  <div className="mt-0.5 text-[13px] text-fg-muted">{p.body}</div>
+                </button>
+              ))}
+            </div>
+          </Card>
+        )}
+
+        {step === 1 && (
+          <Card className="p-5">
+            <Field
+              label="Name (optional, private)"
+              htmlFor="task-label"
+              hint="Only saved in this browser to help you recognise the task. The contract stores no names; on-chain it is identified by its number."
+            >
+              <Input id="task-label" maxLength={60} value={taskLabel} onChange={(e) => setTaskLabel(e.target.value)} placeholder="e.g. Logo design for Ada" />
+            </Field>
+          </Card>
+        )}
+
         {step === 1 && kind === TaskKind.ProjectBudget && (
           <Card>
             <CardHeader title="Budget, recipient and checkpoints" description="Each checkpoint has an amount and the address allowed to verify it." />
@@ -341,7 +436,7 @@ function Builder() {
         )}
 
         {step === 3 && rule && <Review rule={rule} />}
-        {step === 4 && rule && <FundAndActivate rule={rule} />}
+        {step === 4 && rule && <FundAndActivate rule={rule} label={taskLabel} />}
 
         {step > 0 && step < 4 && (
           <div className="flex justify-between">
@@ -422,7 +517,7 @@ function Review({ rule }: { rule: RuleInput }) {
   );
 }
 
-function FundAndActivate({ rule }: { rule: RuleInput }) {
+function FundAndActivate({ rule, label }: { rule: RuleInput; label: string }) {
   const d = deploymentInfo!;
   const { address } = useAccount();
   const { assessment } = useFundingAssessment();
@@ -483,7 +578,10 @@ function FundAndActivate({ rule }: { rule: RuleInput }) {
           });
     if (r) {
       const ev = parseEventLogs({ abi: vaultAbi, logs: r.logs, eventName: "TaskCreated" })[0];
-      if (ev) setCreatedId(ev.args.taskId);
+      if (ev) {
+        setCreatedId(ev.args.taskId);
+        if (label.trim()) saveTaskLabel(ev.args.taskId.toString(), label);
+      }
     }
   };
 

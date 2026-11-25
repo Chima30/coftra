@@ -5,6 +5,7 @@ import { useAccount, useBalance, useSwitchChain } from "wagmi";
 import { parseEther } from "viem";
 import { PageHeader, ThemeToggle } from "@/components/app-shell";
 import { FundingDetail } from "@/components/funding";
+import { ReserveTopUp } from "@/components/reserve-topup";
 import { Hex } from "@/components/hex";
 import { NotDeployed } from "@/components/states";
 import { TxStatusLine } from "@/components/tx-status";
@@ -29,6 +30,7 @@ export function SettingsView() {
       ) : (
         <div className="space-y-6">
           <FundingDetail />
+          <ReserveTopUp />
           <TopUp />
           <Card>
             <CardHeader title="Contracts" description="Open source; verify each address on its explorer." />

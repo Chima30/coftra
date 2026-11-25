@@ -6,6 +6,7 @@ import type { TaskView } from "@/lib/reads";
 import { kindLabel, stateCopy, TaskKind, TaskState } from "@/lib/protocol";
 import { fmtToken, relTime, cn } from "@/lib/format";
 import { Badge } from "./ui/primitives";
+import { TaskLabelText } from "./task-label";
 
 export function StateBadge({ state }: { state: TaskState }) {
   const s = stateCopy[state];
@@ -56,6 +57,7 @@ export function TaskRow({ t, role }: { t: TaskView; role?: string }) {
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <span className="font-medium text-fg">Task #{t.id.toString()}</span>
+            <TaskLabelText taskId={t.id} />
             <StateBadge state={state} />
             {role && <Badge>{role}</Badge>}
           </div>

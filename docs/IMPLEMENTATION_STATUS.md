@@ -63,6 +63,16 @@ Issue found and fixed during live testing: `sepolia.base.org` limits `eth_getLog
 | Reactive reserve | 3.2578 lREACT, no debt, cron off, after a 1.2 lREACT top-up (Lasna tx `0x92f3aa5261b752ba0c7075d5d983c04f56c8a4a04f2623ace2f790664803918e`, 2026-11-18). Covers ≈6.9 h of open-task automation at the measured rate (≈11.3 lREACT per day). A larger top-up is still recommended before judging |
 | Frontend fixes | Cancelled or replaced transactions no longer shown as confirmed; writes pinned to Base Sepolia; slow-transaction hint; runway warnings; shareable `/proof/<id>` pages |
 
+## Added 2026-11-25 (frontend only, no contract change)
+
+- **Private task names:** saved only in the browser; the contract stores none. Editable on the task page, shown in lists, optional in the Rule Builder.
+- **Rule Builder presets:** freelancer in two stages, grant with three milestones, bot mints one NFT, and a 15-minute FALLBACK demo.
+- **Deadline countdown** on task pages, plus a downloadable calendar reminder (.ics, generated in the browser).
+- **"Keep automation running" card** in Settings: anyone can add lREACT to the reactive contract's reserve through the official `depositTo`. Network check, 10 lREACT cap, non-refundable acknowledgement.
+- **"Copy link to this task"**: task pages are public and need no wallet.
+- Rendering verified in headless Chrome against the production build. The builder presets and the Lasna top-up need a connected wallet and have not been exercised in a real wallet yet.
+- Ideas that need a contract change: [ROADMAP.md](ROADMAP.md).
+
 ## Official submission checklist
 
 Source: https://dorahacks.io/hackathon/reactive-omni-buildathon/detail and the /tracks page, read 2026-11-17.

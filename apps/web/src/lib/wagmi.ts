@@ -15,11 +15,13 @@ const baseTransport = fallback(
   { rank: false },
 );
 
+// Base Sepolia is the app's chain (listed first). Lasna is included only so anyone can top up the reactive
+// contract's execution reserve from Settings; every vault action stays pinned to Base Sepolia in useTx.
 export const wagmiConfig = createConfig({
-  chains: [destination],
+  chains: [destination, lasna],
   // EIP-6963 discovery (on by default) adds each installed wallet by name; injected() is the fallback.
   connectors: [injected()],
-  transports: { [destination.id]: baseTransport },
+  transports: { [destination.id]: baseTransport, [lasna.id]: http(undefined, { retryCount: 2, timeout: 15_000 }) },
   ssr: true,
 });
 
