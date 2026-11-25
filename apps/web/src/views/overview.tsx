@@ -10,6 +10,7 @@ import { TaskRow } from "@/components/task-bits";
 import { EmptyState, ErrorState, NotDeployed } from "@/components/states";
 import { FundingSummary } from "@/components/funding";
 import { RecentActivity } from "@/components/activity-feed";
+import { FirstAutomationGuide, ShowGuideLink } from "@/components/first-guide";
 import { deploymentInfo, useMyTasks } from "@/hooks/use-coftra";
 import { fmtToken, relTime } from "@/lib/format";
 import { TaskState } from "@/lib/protocol";
@@ -151,6 +152,7 @@ function Dashboard() {
 
   return (
     <div className="space-y-6">
+      <FirstAutomationGuide />
       <Card className="grid grid-cols-2 gap-5 p-5 md:grid-cols-4">
         {isLoading ? (
           Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-14" />)
@@ -206,7 +208,11 @@ export function OverviewView() {
   useEffect(() => setMounted(true), []);
   return (
     <>
-      <PageHeader title="Overview" description="Funded tasks, what Reactive Network has done for them, and whether automation can keep running." />
+      <PageHeader
+        title="Overview"
+        description="Funded tasks, what Reactive Network has done for them, and whether automation can keep running."
+        action={mounted && isConnected ? <ShowGuideLink /> : undefined}
+      />
       {!deploymentInfo ? (
         <div className="space-y-6">
           <Intro />

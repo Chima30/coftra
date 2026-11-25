@@ -18,6 +18,7 @@ import { useNow } from "@/hooks/use-now";
 import { saveTaskLabel } from "@/lib/labels";
 import { RuleDiagramView } from "@/components/rule-diagram";
 import { SafetyInspector } from "@/components/safety-inspector";
+import { FirstAutomationGuide } from "@/components/first-guide";
 import { hasWarnings, inspectRule, type Finding } from "@/lib/inspect";
 import { approveArgs, projectCreateArgs, sessionCreateArgs } from "@/lib/tx-builders";
 import { mockUsdcAbi, vaultAbi } from "@/lib/contracts";
@@ -94,6 +95,9 @@ export function CreateView() {
         description="Build a rule from a supported template. Everything you set here is enforced by the vault contract, and you'll see it in plain language before signing."
       />
       <RequireWallet why="Creating a task deposits test funds from your wallet into the vault. Connect a wallet on Base Sepolia to continue.">
+        <div className="mb-6">
+          <FirstAutomationGuide compact />
+        </div>
         <Builder />
       </RequireWallet>
     </>
