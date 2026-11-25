@@ -41,7 +41,7 @@ export function ScenarioDetailView({ id }: { id: string }) {
           {copied ? <Check className="size-4" /> : <Link2 className="size-4" />} {copied ? "Link copied" : "Copy link"}
         </Button>
       </Card>
-      <ScenarioCard s={s} />
+      <ScenarioCard s={s} main />
       <Card>
         <div className="border-b border-border px-5 py-3">
           <h2 className="text-xl">Asset movements</h2>

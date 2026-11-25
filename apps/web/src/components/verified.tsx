@@ -133,7 +133,9 @@ function StageCard({ st, gas }: { st: Stage; gas?: ReceiptCheck }) {
   );
 }
 
-export function ScenarioCard({ s }: { s: Scenario }) {
+export function ScenarioCard({ s, main = false }: { s: Scenario; main?: boolean }) {
+  // On its own page the scenario title is the page heading.
+  const Title = main ? "h1" : "h3";
   const { data } = useEvidenceCheck();
   const stages = stagesOf(s, data);
   return (
@@ -147,7 +149,7 @@ export function ScenarioCard({ s }: { s: Scenario }) {
           <Clock3 className="size-3" aria-hidden /> origin → callback ≈ {s.latencySeconds}s
         </span>
       </div>
-      <h3 className="mt-4 text-[32px] leading-tight sm:text-4xl">{s.title}</h3>
+      <Title className="mt-4 text-[32px] leading-tight sm:text-4xl">{s.title}</Title>
       <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-fg-muted">{s.summary}</p>
 
       <ol className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5" aria-label="Verified pipeline">

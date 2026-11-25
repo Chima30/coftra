@@ -1,7 +1,13 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import { PageHeader } from "@/components/app-shell";
 import { VerifiedShowcase } from "@/components/verified";
 import { ActivityView } from "@/views/activity";
+
+export const metadata: Metadata = {
+  title: "Automation activity — Coftra",
+  description: "Every Reactive Network callback, traced from origin event to vault.",
+};
 
 // The header and the verified showcase sit outside the Suspense boundary so they are prerendered into the
 // HTML and visible immediately, with no wallet. Only the live list (which reads URL params) streams in.
