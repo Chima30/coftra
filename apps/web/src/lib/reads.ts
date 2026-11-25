@@ -123,7 +123,7 @@ export async function readFundingHealth(d: Deployment) {
     destinationClient.readContract({ address: CALLBACK_PROXY, abi: payableAbi, functionName: "debt", args: [d.vault] }),
     destinationClient.getGasPrice(),
   ]);
-  const [rcBalance, rcDebt, rcReserves, openTasks, cronSubscribed, paused, cronTopic, lasnaGasPrice] = await Promise.all([
+  const [rcBalance, rcDebt, rcReserves, openTasks, cronSubscribed, paused, cronTopic, lasnaGasPrice, openTaskIds] = await Promise.all([
     lasnaClient.getBalance({ address: d.reactive }),
     lasnaClient.readContract({ address: SYSTEM_CONTRACT, abi: payableAbi, functionName: "debt", args: [d.reactive] }),
     lasnaClient.readContract({ address: SYSTEM_CONTRACT, abi: reservesAbi, functionName: "reserves", args: [d.reactive] }),
@@ -132,8 +132,17 @@ export async function readFundingHealth(d: Deployment) {
     lasnaClient.readContract({ address: d.reactive, abi: reactiveAbi, functionName: "paused" }),
     lasnaClient.readContract({ address: d.reactive, abi: reactiveAbi, functionName: "cronTopic" }),
     lasnaClient.getGasPrice(),
+    lasnaClient.readContract({ address: d.reactive, abi: reactiveAbi, functionName: "getOpenTasks" }),
   ]);
-  return { vaultBalance, proxyDebt, destGasPrice, rcBalance, rcDebt, rcReserves, openTasks, cronSubscribed, paused, cronTopic, lasnaGasPrice };
+  // Deadlines of the tasks the reactive contract is watching, read from the vault (the source of truth).
+  const watched = openTaskIds.length
+    ? await destinationClient.multicall({
+        allowFailure: false,
+        contracts: openTaskIds.slice(0, 20).map((id) => ({ address: d.vault, abi: vaultAbi, functionName: "getTask" as const, args: [id] as const })),
+      })
+    : [];
+  const watchedTasks = openTaskIds.slice(0, 20).map((id, i) => ({ id, deadline: watched[i].deadline, state: watched[i].state }));
+  return { vaultBalance, proxyDebt, destGasPrice, rcBalance, rcDebt, rcReserves, openTasks, cronSubscribed, paused, cronTopic, lasnaGasPrice, watchedTasks };
 }
 
 export type FundingHealth = Awaited<ReturnType<typeof readFundingHealth>>;

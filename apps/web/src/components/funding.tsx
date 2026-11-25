@@ -6,7 +6,10 @@ import { useFunding } from "@/hooks/use-coftra";
 import { assessFunding, ASSUMPTIONS, OBSERVED_LREACT_PER_MIN_WHILE_OPEN, type HealthLevel } from "@/lib/funding";
 import { fmtNative } from "@/lib/format";
 import { callbackResultCopy, CallbackResult } from "@/lib/protocol";
-import { useActivity } from "./activity-feed";
+import { RecentActivity, useActivity } from "./activity-feed";
+import { useNow } from "@/hooks/use-now";
+import { relTime } from "@/lib/format";
+import { stateCopy, TaskState } from "@/lib/protocol";
 import { Badge, Card, CardHeader, Notice, Skeleton } from "./ui/primitives";
 
 const levelTone: Record<HealthLevel, "success" | "warning" | "danger"> = { ok: "success", low: "warning", blocked: "danger" };
@@ -108,13 +111,23 @@ function CallbackStats() {
 }
 
 export function FundingDetail() {
-  const { data, assessment, isLoading, error, refetch } = useFundingAssessment();
+  const { data, assessment, isLoading, error, refetch, dataUpdatedAt, isFetching } = useFundingAssessment();
+  const now = useNow(5_000);
+  const ageSec = dataUpdatedAt ? Math.max(0, now - Math.floor(dataUpdatedAt / 1000)) : null;
+  // Stale when the last good read is over 2 minutes old, or the latest refresh failed while older data is shown.
+  const stale = !!data && ((ageSec !== null && ageSec > 120) || !!error);
   return (
     <Card id="funding">
       <CardHeader
         title="Automation health"
         description="Live balances and debts on both chains, clearly labelled estimates, and what to do if something stalls."
-        action={<Fuel className="size-5 text-fg-subtle" />}
+        action={
+          <div className="flex items-center gap-2 text-xs text-fg-subtle">
+            {stale ? <Badge tone="warning">Stale</Badge> : null}
+            {ageSec !== null && <span>{isFetching ? "Refreshing…" : `Checked ${ageSec < 5 ? "just now" : `${ageSec}s ago`}`}</span>}
+            <Fuel className="size-5" />
+          </div>
+        }
       />
       {isLoading ? (
         <div className="p-5">
@@ -165,6 +178,36 @@ export function FundingDetail() {
             {assessment.callbacksAffordable !== null && <KV k="Est. callbacks affordable" v={`≈ ${assessment.callbacksAffordable.toLocaleString()}`} />}
             <h3 className="pt-3 font-medium">Callback history</h3>
             <CallbackStats />
+          </div>
+        </div>
+      )}
+      {data && (
+        <div className="grid gap-6 border-t border-border px-5 py-4 text-sm md:grid-cols-2">
+          <div>
+            <h3 className="font-medium">Tasks automation is watching</h3>
+            {data.watchedTasks.length === 0 ? (
+              <p className="mt-2 text-fg-muted">None right now, so no scheduled checks are running or billed.</p>
+            ) : (
+              <ul className="mt-2 space-y-1.5">
+                {data.watchedTasks.map((w) => (
+                  <li key={w.id.toString()} className="flex justify-between gap-3">
+                    <Link href={`/tasks/${w.id}`} className="text-accent hover:underline">
+                      Task #{w.id.toString()}
+                    </Link>
+                    <span className="text-fg-muted">
+                      {stateCopy[w.state as TaskState]?.label ?? "?"} · deadline {relTime(w.deadline, now)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <p className="mt-2 text-xs text-fg-subtle">Read from the reactive contract&apos;s deadline index, with each state confirmed by the vault.</p>
+          </div>
+          <div>
+            <h3 className="font-medium">Most recent callbacks</h3>
+            <div className="-mx-5 mt-1">
+              <RecentActivity limit={4} />
+            </div>
           </div>
         </div>
       )}
