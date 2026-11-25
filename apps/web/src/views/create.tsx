@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import { useAccount, useReadContracts } from "wagmi";
-import { isAddress, parseEventLogs, toFunctionSelector, type Address } from "viem";
+import { isAddress, parseEventLogs } from "viem";
 import { Check, Flag, KeyRound, Minus, Plus } from "lucide-react";
 import { PageHeader } from "@/components/app-shell";
 import { RequireWallet } from "@/components/states";
@@ -16,6 +16,7 @@ import { deploymentInfo } from "@/hooks/use-coftra";
 import { useTx } from "@/hooks/use-tx";
 import { useNow } from "@/hooks/use-now";
 import { saveTaskLabel } from "@/lib/labels";
+import { approveArgs, projectCreateArgs, sessionCreateArgs } from "@/lib/tx-builders";
 import { mockUsdcAbi, vaultAbi } from "@/lib/contracts";
 import { destination } from "@/lib/chains";
 import { cn, fmtDate, fmtToken, parseToken } from "@/lib/format";
@@ -546,35 +547,13 @@ function FundAndActivate({ rule, label }: { rule: RuleInput; label: string }) {
             address: d.vault,
             abi: vaultAbi,
             functionName: "createProjectTask",
-            args: [
-              d.token,
-              rule.amount,
-              rule.recipient as Address,
-              rule.refundTo as Address,
-              BigInt(rule.deadline),
-              rule.milestones.map((m) => m.amount),
-              rule.milestones.map((m) => m.verifier as Address),
-              activateNow,
-            ],
+            args: projectCreateArgs(rule, d.token, activateNow),
           })
         : await create.run("Create spending session", {
             address: d.vault,
             abi: vaultAbi,
             functionName: "createSessionTask",
-            args: [
-              d.token,
-              rule.amount,
-              {
-                executor: rule.executor as Address,
-                target: rule.target as Address,
-                selector: toFunctionSelector("mint(address)"),
-                beneficiary: rule.beneficiary as Address,
-                spendCap: rule.spendCap,
-              },
-              rule.refundTo as Address,
-              BigInt(rule.deadline),
-              activateNow,
-            ],
+            args: sessionCreateArgs(rule, d.token, activateNow),
           });
     if (r) {
       const ev = parseEventLogs({ abi: vaultAbi, logs: r.logs, eventName: "TaskCreated" })[0];
@@ -642,7 +621,7 @@ function FundAndActivate({ rule, label }: { rule: RuleInput; label: string }) {
             ) : (
               <Button
                 disabled={!enough || approve.busy}
-                onClick={() => approve.run("Approve tUSDC", { address: d.token, abi: mockUsdcAbi, functionName: "approve", args: [d.vault, rule.amount] })}
+                onClick={() => approve.run("Approve tUSDC", { address: d.token, abi: mockUsdcAbi, functionName: "approve", args: approveArgs(rule, d.vault) })}
               >
                 Approve
               </Button>

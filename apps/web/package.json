@@ -9,7 +9,8 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "sync:contracts": "node scripts/sync-contracts.mjs",
-    "verify:proofs": "node scripts/verify-proofs.mjs"
+    "verify:proofs": "node scripts/verify-proofs.mjs",
+    "test": "vitest run"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.108.0",
@@ -31,7 +32,8 @@
     "eslint": "^9",
     "eslint-config-next": "16.4.6",
     "tailwindcss": "4.3.3",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^5.1.2"
   },
   "packageManager": "pnpm@10.34.9"
 }
