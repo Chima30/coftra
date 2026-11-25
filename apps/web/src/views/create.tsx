@@ -16,6 +16,7 @@ import { deploymentInfo } from "@/hooks/use-coftra";
 import { useTx } from "@/hooks/use-tx";
 import { useNow } from "@/hooks/use-now";
 import { saveTaskLabel } from "@/lib/labels";
+import { RuleDiagramView } from "@/components/rule-diagram";
 import { approveArgs, projectCreateArgs, sessionCreateArgs } from "@/lib/tx-builders";
 import { mockUsdcAbi, vaultAbi } from "@/lib/contracts";
 import { destination } from "@/lib/chains";
@@ -436,6 +437,8 @@ function Builder() {
           </Card>
         )}
 
+        {(step === 1 || step === 2) && rule && <RuleDiagramView rule={rule} />}
+        {step === 3 && rule && <RuleDiagramView rule={rule} onEdit={(st) => setStep(st)} />}
         {step === 3 && rule && <Review rule={rule} />}
         {step === 4 && rule && <FundAndActivate rule={rule} label={taskLabel} />}
 
