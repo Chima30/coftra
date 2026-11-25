@@ -63,7 +63,7 @@ export function ProofView({ item }: { item: ActivityItem }) {
   const reqTime = useBlockTime("lasna", item.status === "awaiting" ? item.request.blockNumber : undefined);
 
   if (item.status === "awaiting") {
-    const ageSec = reqTime.data ? now - Number(reqTime.data) : 0;
+    const ageSec = reqTime.data && now > 0 ? now - Number(reqTime.data) : 0;
     const stale = ageSec > 15 * 60;
     return (
       <Card className="p-5">

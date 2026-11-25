@@ -53,7 +53,7 @@ function downloadIcs(taskId: bigint, deadline: number, label: string) {
 export function DeadlineCountdown({ taskId, deadline, state, label }: { taskId: bigint; deadline: number; state: TaskState; label: string }) {
   const now = useNow(1000);
   const open = state === TaskState.Active || state === TaskState.Funded;
-  if (!open) return null;
+  if (!open || now === 0) return null;
   const left = deadline - now;
   return (
     <div className="space-y-2 rounded-md border border-border p-3">

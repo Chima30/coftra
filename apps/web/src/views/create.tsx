@@ -164,6 +164,10 @@ function Builder() {
     }
     e.refundTo = addr(refundTo);
     const now = nowTs;
+    if (now === 0) {
+      e.deadline = null; // clock not read yet (first render); validated on the next tick
+      return e;
+    }
     e.deadline = !deadlineTs || deadlineTs < now + MIN_LEAD_SECONDS ? "Pick a time at least 5 minutes from now." : deadlineTs > now + 365 * 86400 ? "Maximum is 365 days." : null;
     return e;
   }, [kind, recipient, budget, milestones, executor, beneficiary, spendCap, sessionBudget, refundTo, deadlineTs, nowTs]);
@@ -206,7 +210,7 @@ function Builder() {
   }, [kind, budget, recipient, refundTo, deadlineTs, milestones, sessionBudget, executor, beneficiary, spendCap, errors]);
 
   const findings = useMemo(
-    () => (rule && address ? inspectRule(rule, { owner: address, nowTs, runwayHours: fundingAssessment?.runwayHoursWhileOpen }) : []),
+    () => (rule && address && nowTs > 0 ? inspectRule(rule, { owner: address, nowTs, runwayHours: fundingAssessment?.runwayHoursWhileOpen }) : []),
     [rule, address, nowTs, fundingAssessment?.runwayHoursWhileOpen],
   );
 

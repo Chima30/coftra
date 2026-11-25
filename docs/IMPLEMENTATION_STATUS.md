@@ -73,6 +73,23 @@ Issue found and fixed during live testing: `sepolia.base.org` limits `eth_getLog
 - Rendering verified in headless Chrome against the production build. The builder presets and the Lasna top-up need a connected wallet and have not been exercised in a real wallet yet.
 - Ideas that need a contract change: [ROADMAP.md](ROADMAP.md).
 
+## Product experience upgrade (branch `product-experience-upgrade`, not yet merged)
+
+Frontend only; deployed contracts and addresses unchanged.
+
+| Area | What changed | Evidence |
+|---|---|---|
+| Task creation (P0) | Builder transaction arguments are now pure functions (`lib/tx-builders.ts`) | Fork simulation against live contract code: exact approval → create → attest → owner override → session spend → cancel and refund all pass (`COFTRA_FORK_RPC=… pnpm test`) |
+| Replay | Step-through of the four recorded loops with vault state per step, on `/proof` and each receipt | Headless render; replay data unit-tested |
+| Automation health | Freshness and Stale flag, watched tasks with vault-confirmed state, recent callbacks | Headless render |
+| Rule Builder | WHEN / THEN / OTHERWISE diagram from the same input as the contract arguments | Unit tests compare the diagram with the exact call arguments |
+| Receipts | Asset movements table and embedded replay on `/proof/<id>` | Unit test: every movement cites a transaction from its own loop |
+| Safety inspector | Flags risky configurations; warnings must be acknowledged before Create | Unit tests (7) |
+| Guided first automation | Dismissible checklist ticked from wallet and chain state | Typecheck and lint only; needs a wallet to exercise |
+| Prerender fix | `useNow` no longer reads the clock during prerender (Next.js 16 blocked the build) | Production build passes |
+
+Tests: Foundry 41/41 · Vitest 21/21 with fork (19 + 2 skipped without) · tsc 0 · lint 0 · build 16/16 pages · `verify:proofs` 60/60.
+
 ## Official submission checklist
 
 Source: https://dorahacks.io/hackathon/reactive-omni-buildathon/detail and the /tracks page, read 2026-11-17.

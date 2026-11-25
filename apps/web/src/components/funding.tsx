@@ -113,7 +113,7 @@ function CallbackStats() {
 export function FundingDetail() {
   const { data, assessment, isLoading, error, refetch, dataUpdatedAt, isFetching } = useFundingAssessment();
   const now = useNow(5_000);
-  const ageSec = dataUpdatedAt ? Math.max(0, now - Math.floor(dataUpdatedAt / 1000)) : null;
+  const ageSec = dataUpdatedAt && now > 0 ? Math.max(0, now - Math.floor(dataUpdatedAt / 1000)) : null;
   // Stale when the last good read is over 2 minutes old, or the latest refresh failed while older data is shown.
   const stale = !!data && ((ageSec !== null && ageSec > 120) || !!error);
   return (
@@ -195,7 +195,7 @@ export function FundingDetail() {
                       Task #{w.id.toString()}
                     </Link>
                     <span className="text-fg-muted">
-                      {stateCopy[w.state as TaskState]?.label ?? "?"} · deadline {relTime(w.deadline, now)}
+                      {stateCopy[w.state as TaskState]?.label ?? "?"}{now > 0 ? ` · deadline ${relTime(w.deadline, now)}` : ""}
                     </span>
                   </li>
                 ))}

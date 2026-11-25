@@ -234,7 +234,7 @@ function Milestones({ t, verifierOf, isOwner }: { t: T; verifierOf: number[]; is
                     Attest completion
                   </Button>
                 )}
-                {isOwner && active && !m.done && Number(t.task.deadline) > nowTs && confirmIdx !== i && (
+                {isOwner && active && !m.done && nowTs > 0 && Number(t.task.deadline) > nowTs && confirmIdx !== i && (
                   <Button size="sm" variant="secondary" disabled={release.busy} onClick={() => setConfirmIdx(i)}>
                     Owner override…
                   </Button>
@@ -359,7 +359,9 @@ function Actions({ t, isOwner }: { t: T; isOwner: boolean }) {
   const tx = useTx();
   const [newDeadline, setNewDeadline] = useState("");
   const state = t.task.state as TaskState;
-  const now = BigInt(useNow());
+  const nowSec = useNow();
+  const known = nowSec > 0; // time-dependent actions wait until the clock is read after mount
+  const now = BigInt(nowSec);
   const recoveryAt = t.task.deadline + MANUAL_RECOVERY_DELAY;
   const credit = useReadContract({
     address: d.vault,
@@ -380,7 +382,7 @@ function Actions({ t, isOwner }: { t: T; isOwner: boolean }) {
             Activate automation
           </Button>
         )}
-        {isOwner && state === TaskState.Active && now < t.task.deadline && (
+        {known && isOwner && state === TaskState.Active && now < t.task.deadline && (
           <div className="space-y-2">
             <label htmlFor="nd" className="font-medium">Extend deadline</label>
             <Input id="nd" type="datetime-local" value={newDeadline} onChange={(e) => setNewDeadline(e.target.value)} />
@@ -407,7 +409,7 @@ function Actions({ t, isOwner }: { t: T; isOwner: boolean }) {
             Cancel and return funds
           </Button>
         )}
-        {state === TaskState.Active && now >= t.task.deadline && (
+        {known && state === TaskState.Active && now >= t.task.deadline && (
           <div className="space-y-2">
             <Notice tone="info" title="Deadline passed">
               Reactive Cron should expire this task shortly.{" "}

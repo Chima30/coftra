@@ -76,11 +76,14 @@ describe.skipIf(!RPC)("Rule Builder flow on a fork of the live contracts", () =>
     const att = await send(OWNER, d.verifierRegistry, encodeFunctionData({ abi: registryAbi, functionName: "attest", args: [id, 0n, 1n] }));
     expect(parseEventLogs({ abi: registryAbi, logs: att.logs, eventName: "MilestoneVerified" })).toHaveLength(1);
 
-    // Owner override pays checkpoint 2 directly; it is flagged as not via Reactive.
+    // Owner override pays checkpoint 2 directly; it is flagged as not via Reactive. Measured as a delta so the
+    // test also holds on a fork reused across runs.
+    const balanceOf = (a: Address) => client.readContract({ address: d.token, abi: mockUsdcAbi, functionName: "balanceOf", args: [a] });
+    const before = await balanceOf(RECIPIENT);
     const ov = await send(OWNER, d.vault!, encodeFunctionData({ abi: vaultAbi, functionName: "ownerReleaseMilestone", args: [id, 1n] }));
     const rel = parseEventLogs({ abi: vaultAbi, logs: ov.logs, eventName: "MilestoneReleased" })[0];
     expect(rel.args.viaReactive).toBe(false);
-    expect(await client.readContract({ address: d.token, abi: mockUsdcAbi, functionName: "balanceOf", args: [RECIPIENT] })).toBe(50_000_000n);
+    expect((await balanceOf(RECIPIENT)) - before).toBe(50_000_000n);
   });
 
   it("creates a spending session, lets only the executor mint to the owner, and refunds on cancel", async () => {
