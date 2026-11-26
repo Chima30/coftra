@@ -20,7 +20,8 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <Card className="relative flex flex-col items-center overflow-hidden rounded-[32px] px-6 py-14 text-center">
+    // No overflow clipping: actions such as the wallet menu open below the card.
+    <Card className="flex flex-col items-center rounded-[32px] px-6 py-14 text-center">
       {icon && <div className="mb-3 text-fg-subtle">{icon}</div>}
       <h3 className="text-[26px] text-fg">{title}</h3>
       {body && <p className="mt-2 max-w-md text-[13px] leading-relaxed text-fg-muted">{body}</p>}
@@ -58,7 +59,7 @@ export function RequireWallet({ children, why }: { children: ReactNode; why: str
   useEffect(() => setMounted(true), []);
   if (!deploymentInfo) return <NotDeployed />;
   if (!mounted) return null;
-  if (!isConnected) return <EmptyState title="Connect a wallet" body={why} action={<ConnectButton />} />;
+  if (!isConnected) return <EmptyState title="Connect a wallet" body={why} action={<ConnectButton align="center" />} />;
   return <>{children}</>;
 }
 

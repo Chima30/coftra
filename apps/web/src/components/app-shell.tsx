@@ -110,7 +110,9 @@ export function ThemeToggle() {
   );
 }
 
-export function ConnectButton() {
+/** `align` positions the wallet menu: "end" under the button's right edge (header), "center" under its middle (cards). */
+export function ConnectButton({ align = "end" }: { align?: "end" | "center" }) {
+  const pop = align === "center" ? "left-1/2 -translate-x-1/2" : "right-0";
   const { address, isConnected, chainId } = useAccount();
   const { connect, connectors, isPending, error, reset } = useConnect();
   const { disconnect } = useDisconnect();
@@ -145,7 +147,7 @@ export function ConnectButton() {
           {isPending ? "Connecting…" : options.length === 0 ? "No wallet found" : "Connect wallet"}
         </Button>
         {menuOpen && (
-          <div role="menu" className="absolute right-0 z-40 mt-2 w-60 rounded-2xl border border-border bg-surface p-1.5 shadow-[0_12px_40px_-12px_rgb(36_36_36/0.25)]">
+          <div role="menu" className={`absolute ${pop} z-40 mt-2 w-60 text-left rounded-2xl border border-border bg-surface p-1.5 shadow-[0_12px_40px_-12px_rgb(36_36_36/0.25)]`}>
             {options.map((c, i) => (
               <button
                 key={c.uid}
@@ -161,7 +163,7 @@ export function ConnectButton() {
           </div>
         )}
         {error && (
-          <div role="alert" className="absolute right-0 z-40 mt-2 w-72 rounded-2xl border border-danger/30 bg-danger-soft p-4 text-xs text-danger shadow-[0_12px_40px_-12px_rgb(36_36_36/0.25)]">
+          <div role="alert" className={`absolute ${pop} z-40 mt-2 w-72 rounded-2xl border border-danger/30 bg-danger-soft p-4 text-left text-xs text-danger shadow-[0_12px_40px_-12px_rgb(36_36_36/0.25)]`}>
             <div className="font-medium">Couldn&apos;t connect</div>
             <p className="mt-1 text-fg-muted">
               {error.message.split("\n")[0].slice(0, 140).replace(/\.+$/, "")}. If the wallet is installed, check it is enabled and unlocked, then try again or
