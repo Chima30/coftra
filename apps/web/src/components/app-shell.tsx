@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Suspense, useEffect, useState, type ReactNode } from "react";
-import { useAccount, useConnect, useDisconnect, useSwitchChain } from "wagmi";
+import { Suspense, useEffect, useRef, useState, type ReactNode } from "react";
+import { useAccount, useConfig, useConnect, useDisconnect, useSwitchChain } from "wagmi";
 import {
   Activity,
   BadgeCheck,
@@ -114,13 +114,50 @@ export function ThemeToggle() {
 export function ConnectButton({ align = "end" }: { align?: "end" | "center" }) {
   const pop = align === "center" ? "left-1/2 -translate-x-1/2" : "right-0";
   const { address, isConnected, chainId } = useAccount();
-  const { connect, connectors, isPending, error, reset } = useConnect();
+  const config = useConfig();
+  const { connectAsync, connectors, isPending, error, reset } = useConnect();
   const { disconnect } = useDisconnect();
   const { switchChain } = useSwitchChain();
   const [mounted, setMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const wrap = useRef<HTMLDivElement>(null);
   // eslint-disable-next-line react-hooks/set-state-in-effect -- avoid hydration mismatch on wallet state
   useEffect(() => setMounted(true), []);
+
+  // A click outside or Escape closes the wallet menu and any connect error.
+  useEffect(() => {
+    if (!menuOpen && !error) return;
+    const onDown = (e: PointerEvent) => {
+      if (wrap.current && !wrap.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+        reset();
+      }
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setMenuOpen(false);
+        reset();
+      }
+    };
+    document.addEventListener("pointerdown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [menuOpen, error, reset]);
+
+  /**
+   * With several wallet extensions installed, an earlier attempt or an unfinished automatic reconnect can leave wagmi
+   * holding a "current" connection while nothing is actually connected; connecting again then fails with
+   * "Connector already connected". Clearing that leftover state touches nothing outside this page: no wallet call is made.
+   */
+  const clearStaleConnection = () => {
+    const s = config.state;
+    if (s.current && s.status !== "connected") {
+      config.setState((x) => ({ ...x, connections: new Map(), current: null, status: "disconnected" }));
+    }
+  };
 
   if (!mounted) return <Button variant="secondary" size="sm" disabled>Wallet</Button>;
   if (!isConnected) {
@@ -129,19 +166,33 @@ export function ConnectButton({ align = "end" }: { align?: "end" | "center" }) {
     // so it is only offered when no wallet announced itself.
     const named = connectors.filter((c) => c.id !== "injected");
     const options = named.length > 0 ? named : connectors;
-    const pick = (i: number) => {
+    const pick = async (i: number) => {
       setMenuOpen(false);
       reset();
-      connect({ connector: options[i] });
+      clearStaleConnection();
+      try {
+        await connectAsync({ connector: options[i] });
+      } catch (e) {
+        // Recover once from a leftover connection instead of showing the error.
+        if ((e as Error | undefined)?.name === "ConnectorAlreadyConnectedError") {
+          clearStaleConnection();
+          reset();
+          await connectAsync({ connector: options[i] }).catch(() => {});
+        }
+      }
     };
     return (
-      <div className="relative">
+      <div ref={wrap} className="relative">
         <Button
           size="sm"
           disabled={options.length === 0 || isPending}
           aria-haspopup={options.length > 1 ? "menu" : undefined}
           aria-expanded={options.length > 1 ? menuOpen : undefined}
-          onClick={() => (options.length > 1 ? setMenuOpen((o) => !o) : pick(0))}
+          onClick={() => {
+            reset();
+            if (options.length > 1) setMenuOpen((o) => !o);
+            else void pick(0);
+          }}
         >
           <Wallet className="size-4" />
           {isPending ? "Connecting…" : options.length === 0 ? "No wallet found" : "Connect wallet"}
@@ -152,7 +203,7 @@ export function ConnectButton({ align = "end" }: { align?: "end" | "center" }) {
               <button
                 key={c.uid}
                 role="menuitem"
-                onClick={() => pick(i)}
+                onClick={() => void pick(i)}
                 className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-[13px] hover:bg-surface-2 focus-visible:bg-surface-2"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element -- wallet icons are data URIs from the extension */}
@@ -162,7 +213,7 @@ export function ConnectButton({ align = "end" }: { align?: "end" | "center" }) {
             ))}
           </div>
         )}
-        {error && (
+        {error && !menuOpen && (
           <div role="alert" className={`absolute ${pop} z-40 mt-2 w-72 rounded-2xl border border-danger/30 bg-danger-soft p-4 text-left text-xs text-danger shadow-[0_12px_40px_-12px_rgb(36_36_36/0.25)]`}>
             <div className="font-medium">Couldn&apos;t connect</div>
             <p className="mt-1 text-fg-muted">
