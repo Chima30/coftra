@@ -21,7 +21,7 @@ export function EmptyState({
 }) {
   return (
     // No overflow clipping: actions such as the wallet menu open below the card.
-    <Card className="flex flex-col items-center rounded-[32px] px-6 py-14 text-center">
+    <Card className="flex flex-col items-center px-6 py-14 text-center">
       {icon && <div className="mb-3 text-fg-subtle">{icon}</div>}
       <h3 className="text-[26px] text-fg">{title}</h3>
       {body && <p className="mt-2 max-w-md text-[13px] leading-relaxed text-fg-muted">{body}</p>}

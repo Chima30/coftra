@@ -39,7 +39,7 @@ const trySteps = [
 function HowToTry() {
   return (
     <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
-      <Card className="rounded-[32px] p-6 sm:p-8">
+      <Card className="p-6 sm:p-8">
         <h2 className="text-3xl">Try it yourself in about ten minutes</h2>
         <ol className="mt-6 grid gap-6 sm:grid-cols-2">
           {trySteps.map((s, i) => (
@@ -53,7 +53,7 @@ function HowToTry() {
           ))}
         </ol>
       </Card>
-      <Card className="rounded-[32px] bg-surface-2 p-6 text-[13px] leading-relaxed text-fg-muted sm:p-8">
+      <Card className="bg-surface-2 p-6 text-[13px] leading-relaxed text-fg-muted sm:p-8">
         <h2 className="text-3xl text-fg">What Coftra controls</h2>
         <ul className="mt-5 space-y-3">
           <li>

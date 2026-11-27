@@ -100,7 +100,7 @@ function stagesOf(s: Scenario, data?: Record<string, ReceiptCheck>): Stage[] {
 
 function StageCard({ st, gas }: { st: Stage; gas?: ReceiptCheck }) {
   return (
-    <li className="relative flex min-w-0 flex-col rounded-3xl border border-border bg-bg p-4">
+    <li className="relative flex min-w-0 flex-col rounded-xl border border-border bg-bg p-4">
       <div className="flex items-center justify-between gap-2">
         <span className={cn("flex size-8 items-center justify-center rounded-full text-[11px] font-medium text-[#242424]", st.tint)}>{st.n}</span>
         {st.chainId && <Badge>{chainName(st.chainId)}</Badge>}
@@ -139,10 +139,10 @@ export function ScenarioCard({ s, main = false }: { s: Scenario; main?: boolean 
   const { data } = useEvidenceCheck();
   const stages = stagesOf(s, data);
   return (
-    <Card id={s.id} className="scroll-mt-24 rounded-[32px] p-5 sm:p-8">
+    <Card id={s.id} className="scroll-mt-24 p-5 sm:p-8">
       <div className="flex flex-wrap items-center gap-2">
         <Badge tone={engineTone[s.engine]}>
-          <span className="font-mono tracking-[0.12em]">{s.engine}</span>
+          <span className="font-mono">{s.engine}</span>
         </Badge>
         <span className="text-xs text-fg-subtle">Task #{s.taskId}</span>
         <span className="flex items-center gap-1 text-xs text-fg-subtle">
@@ -178,7 +178,7 @@ export function ScenarioCard({ s, main = false }: { s: Scenario; main?: boolean 
                 })}
               </dd>
             </dl>
-            <div className="text-[11px] uppercase tracking-[0.14em] text-fg-subtle">Task setup</div>
+            <div className="text-xs text-fg-subtle">Task setup</div>
             <ul className="mt-1.5 space-y-1 text-fg-muted">
               {s.config.map((c) => (
                 <li key={c}>{c}</li>
@@ -224,7 +224,7 @@ export function VerifiedShowcase() {
         {SCENARIOS.map((s) => (
           <li key={s.id} className="px-5 py-4 sm:px-6">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[11px] font-medium tracking-[0.14em] text-fg-subtle">{s.engine}</span>
+              <span className="font-mono text-[11px] text-fg-subtle">{s.engine}</span>
               <span className="font-display text-lg leading-tight">{s.title}</span>
             </div>
             <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-fg-muted">

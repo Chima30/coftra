@@ -20,7 +20,7 @@ export function OutcomePreview({ rule }: { rule: RuleInput }) {
         {cases.map((c, i) => (
           <li key={c.when} className="grid gap-3 px-5 py-5 sm:grid-cols-[minmax(0,15rem)_1fr] sm:gap-6 sm:px-6">
             <div>
-              <div className="text-[10px] uppercase tracking-[0.16em] text-fg-subtle">Case {i + 1}</div>
+              <div className="text-xs text-fg-subtle">Case {i + 1}</div>
               <h3 className="mt-1 text-[22px] leading-snug text-fg">{c.when}</h3>
             </div>
             <div className="min-w-0 space-y-2 text-[13px] leading-relaxed">

@@ -308,7 +308,7 @@ function Builder() {
                   setKind(k);
                   setStep(1);
                 }}
-                className={cn("rounded-3xl border bg-surface p-5 text-left transition-colors hover:border-fg/50", kind === k ? "border-fg ring-1 ring-fg" : "border-border")}
+                className={cn("rounded-2xl border bg-surface p-5 text-left transition-colors hover:border-fg/50", kind === k ? "border-fg ring-1 ring-fg" : "border-border")}
               >
                 <Icon className="size-5 text-accent" />
                 <div className="mt-3 font-medium">{kindLabel[k]}</div>

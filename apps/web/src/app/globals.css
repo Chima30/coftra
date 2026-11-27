@@ -130,40 +130,6 @@ h3,
   border-radius: 6px;
 }
 
-/* Soft pastel atmosphere behind hero areas. Decorative only; hidden from assistive tech by its markup. */
-.atmosphere {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-  border-radius: inherit;
-}
-.atmosphere::before,
-.atmosphere::after {
-  content: "";
-  position: absolute;
-  width: 46%;
-  aspect-ratio: 1;
-  border-radius: 9999px;
-  filter: blur(70px);
-  opacity: 0.55;
-}
-.atmosphere::before {
-  background: var(--periwinkle);
-  top: -30%;
-  right: -8%;
-}
-.atmosphere::after {
-  background: var(--mint);
-  bottom: -40%;
-  right: 22%;
-  opacity: 0.35;
-}
-.dark .atmosphere::before,
-.dark .atmosphere::after {
-  opacity: 0.12;
-}
-
 .tabular {
   font-variant-numeric: tabular-nums;
 }

@@ -46,7 +46,7 @@ export function IncomingCard({ t, me, linked = true, title }: { t: TaskView; me:
     </>
   );
   return linked ? (
-    <Link href={`/tasks/${t.id}`} className="block rounded-3xl border border-border bg-surface p-5 transition-colors hover:border-border-strong">
+    <Link href={`/tasks/${t.id}`} className="block rounded-2xl border border-border bg-surface p-5 transition-colors hover:border-border-strong">
       {body}
     </Link>
   ) : (
@@ -60,7 +60,7 @@ export function AllowanceCard({ t, me }: { t: TaskView; me: string }) {
   const a = allowanceFor(t, me, (x) => nameOf(contacts, x) ?? shortHex(x));
   if (!a) return null;
   return (
-    <Link href={`/tasks/${t.id}`} className="block rounded-3xl border border-border bg-surface p-5 transition-colors hover:border-border-strong">
+    <Link href={`/tasks/${t.id}`} className="block rounded-2xl border border-border bg-surface p-5 transition-colors hover:border-border-strong">
       <div className="flex flex-wrap items-center gap-2">
         <KeyRound className="size-4 text-accent" />
         <span className="font-medium">Task #{t.id.toString()}</span>

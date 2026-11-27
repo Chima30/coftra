@@ -258,7 +258,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
           <div className="flex items-center gap-3">
             <Logo />
-            <span className="hidden rounded-full border border-border-strong px-2 py-0.5 text-[10px] uppercase tracking-[0.12em] text-fg-subtle sm:inline">
+            <span className="hidden rounded-full border border-border-strong px-2 py-0.5 text-[11px] text-fg-subtle sm:inline">
               Testnet
             </span>
           </div>

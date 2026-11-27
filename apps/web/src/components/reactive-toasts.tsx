@@ -87,14 +87,14 @@ export function ReactiveToasts() {
         <div
           key={n.key}
           role="status"
-          className="toast-in pointer-events-auto w-full rounded-3xl border border-border bg-surface p-4 shadow-[0_16px_48px_-16px_rgb(36_36_36/0.35)]"
+          className="toast-in pointer-events-auto w-full rounded-2xl border border-border bg-surface p-4 shadow-[0_16px_48px_-16px_rgb(36_36_36/0.35)]"
         >
           <div className="flex items-start gap-3">
             <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-mint text-[#242424]" aria-hidden>
               <Zap className="size-3.5" />
             </span>
             <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-center gap-x-2 text-[11px] uppercase tracking-[0.14em] text-fg-subtle">
+              <div className="flex flex-wrap items-center gap-x-2 text-xs text-fg-subtle">
                 Reactive Network · Task #{n.taskId.toString()}
                 <TaskLabelText taskId={n.taskId} />
               </div>

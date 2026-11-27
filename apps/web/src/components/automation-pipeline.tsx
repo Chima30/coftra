@@ -141,9 +141,9 @@ export function CoftraAutomationPipeline() {
   const status = !animate ? "Matches each event to its task's rule" : pos.stage === "in" ? "Listening for events" : s.hub;
 
   return (
-    <figure ref={root} className="rounded-[40px] border border-border bg-surface px-5 py-8 sm:px-8">
+    <figure ref={root} className="rounded-3xl border border-border bg-surface px-5 py-8 sm:px-8">
       <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
-        <h2 className="text-3xl text-fg sm:text-4xl">From event to outcome.</h2>
+        <h2 className="text-3xl text-fg sm:text-4xl">From event to outcome</h2>
         <span className="text-xs text-fg-subtle">Illustration, not live activity</span>
       </div>
 
@@ -157,15 +157,10 @@ export function CoftraAutomationPipeline() {
 
       {/* Desktop and tablet: wide left-to-right pipeline. */}
       <svg viewBox="0 0 1040 400" className="mt-4 hidden w-full md:block" aria-hidden fontFamily="var(--font-ui), sans-serif">
-        <defs>
-          <filter id="coftra-hub-glow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="24" />
-          </filter>
-        </defs>
 
-        <text x="120" y="28" textAnchor="middle" className="fill-fg-subtle text-[11px] tracking-[0.14em]">BLOCKCHAIN EVENTS</text>
-        <text x={HUB.x} y="28" textAnchor="middle" className="fill-fg-subtle text-[11px] tracking-[0.14em]">REACTIVE NETWORK</text>
-        <text x="920" y="28" textAnchor="middle" className="fill-fg-subtle text-[11px] tracking-[0.14em]">AUTOMATION ENGINES</text>
+        <text x="120" y="28" textAnchor="middle" className="fill-fg-subtle text-[12px]">Blockchain events</text>
+        <text x={HUB.x} y="28" textAnchor="middle" className="fill-fg-subtle text-[12px]">Reactive Network</text>
+        <text x="920" y="28" textAnchor="middle" className="fill-fg-subtle text-[12px]">Automation engines</text>
 
         {EV_Y.map((y, i) => (
           <path
@@ -197,7 +192,6 @@ export function CoftraAutomationPipeline() {
         ))}
 
         {/* Hub */}
-        <circle cx={HUB.x} cy={HUB.y} r={96} fill="var(--mint)" opacity={0.5} filter="url(#coftra-hub-glow)" />
         {animate && pulse > 0 && <circle key={pulse} cx={HUB.x} cy={HUB.y} r={HUB.r} fill="none" stroke="var(--mint)" strokeWidth={10} className="pipeline-pulse" />}
         <circle cx={HUB.x} cy={HUB.y} r={HUB.r} className="fill-surface stroke-border-strong" strokeWidth={1} />
         <g transform={`translate(${HUB.x - 14} ${HUB.y - 30})`}>
@@ -237,7 +231,7 @@ export function CoftraAutomationPipeline() {
               className={cn("transition-[fill,stroke] duration-300", outActive(i) ? "fill-mint stroke-fg" : "fill-bg stroke-border-strong")}
               strokeWidth={1}
             />
-            <text x="846" y={OUT_Y[i] - 4} className="fill-fg-subtle text-[10px] tracking-[0.14em]">{o.engine}</text>
+            <text x="846" y={OUT_Y[i] - 4} className="fill-fg-subtle font-mono text-[10px]">{o.engine}</text>
             <text x="846" y={OUT_Y[i] + 14} className="fill-fg text-[13px]">{o.action}</text>
           </g>
         ))}
@@ -251,7 +245,7 @@ export function CoftraAutomationPipeline() {
 
       {/* Phones: the same story as a short vertical flow, text at full size. */}
       <div className="mt-5 md:hidden" aria-hidden>
-        <div className="text-[10px] uppercase tracking-[0.14em] text-fg-subtle">Blockchain events</div>
+        <div className="text-xs text-fg-subtle">Blockchain events</div>
         <ul className="mt-2 flex flex-wrap gap-2">
           {EVENTS.map((label, i) => (
             <li
@@ -264,7 +258,6 @@ export function CoftraAutomationPipeline() {
         </ul>
         <Connector dotRef={mInDot} />
         <div className="relative mx-auto flex size-28 items-center justify-center">
-          <span className="absolute inset-0 rounded-full bg-mint opacity-50 blur-2xl" />
           {animate && pulse > 0 && <span key={pulse} className="pipeline-pulse absolute inset-2 rounded-full border-[6px] border-mint" />}
           <span className="relative flex size-24 flex-col items-center justify-center rounded-full border border-border-strong bg-surface text-center">
             <span className="font-display text-xl leading-none">Coftra</span>
@@ -273,7 +266,7 @@ export function CoftraAutomationPipeline() {
         </div>
         <p className="mt-3 min-h-[2.5em] text-center text-xs text-fg-muted">{status}</p>
         <Connector dotRef={mOutDot} />
-        <div className="text-[10px] uppercase tracking-[0.14em] text-fg-subtle">Automation engines</div>
+        <div className="text-xs text-fg-subtle">Automation engines</div>
         <ul className="mt-2 space-y-2">
           {OUTCOMES.map((o, i) => (
             <li
@@ -283,7 +276,7 @@ export function CoftraAutomationPipeline() {
                 outActive(i) ? "border-fg bg-mint text-[#242424]" : "border-border-strong",
               )}
             >
-              <span className={cn("text-[10px] tracking-[0.14em]", outActive(i) ? "text-[#242424]" : "text-fg-subtle")}>{o.engine}</span>
+              <span className={cn("font-mono text-[10px]", outActive(i) ? "text-[#242424]" : "text-fg-subtle")}>{o.engine}</span>
               <span className="text-xs">{o.action}</span>
             </li>
           ))}

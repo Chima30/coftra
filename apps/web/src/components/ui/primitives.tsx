@@ -6,7 +6,7 @@ import type { Tone } from "@/lib/protocol";
 /* Small shadcn-style primitives (cva + Tailwind), kept local to avoid a heavy component dependency. */
 
 export const buttonStyles = cva(
-  "inline-flex items-center justify-center gap-2 rounded-full text-[13px] font-medium tracking-tight transition-colors disabled:pointer-events-none disabled:opacity-45 whitespace-nowrap",
+  "inline-flex items-center justify-center gap-2 rounded-[10px] text-[13px] font-medium transition-colors disabled:pointer-events-none disabled:opacity-45 whitespace-nowrap",
   {
     variants: {
       variant: {
@@ -31,7 +31,7 @@ export function Button({
 }
 
 export function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("rounded-3xl border border-border bg-surface", className)} {...props} />;
+  return <div className={cn("rounded-2xl border border-border bg-surface", className)} {...props} />;
 }
 
 export function CardHeader({
@@ -67,7 +67,7 @@ const toneStyles: Record<Tone, string> = {
 
 export function Badge({ tone = "neutral", className, children }: { tone?: Tone; className?: string; children: React.ReactNode }) {
   return (
-    <span className={cn("inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-medium tracking-wide", toneStyles[tone], className)}>
+    <span className={cn("inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-medium", toneStyles[tone], className)}>
       {children}
     </span>
   );
@@ -105,7 +105,7 @@ export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttribute
     <input
       ref={ref}
       className={cn(
-        "h-11 w-full rounded-2xl border border-border-strong bg-surface px-4 text-[13px] text-fg placeholder:text-fg-subtle focus-visible:outline-2 disabled:opacity-60",
+        "h-11 w-full rounded-[10px] border border-border-strong bg-surface px-4 text-[13px] text-fg placeholder:text-fg-subtle focus-visible:outline-2 disabled:opacity-60",
         className,
       )}
       {...props}
@@ -124,12 +124,12 @@ export function Stat({ label, value, sub }: { label: string; value: React.ReactN
 }
 
 export function Skeleton({ className }: { className?: string }) {
-  return <div className={cn("animate-pulse rounded-2xl bg-surface-2", className)} />;
+  return <div className={cn("animate-pulse rounded-xl bg-surface-2", className)} />;
 }
 
 export function Notice({ tone = "info", title, children }: { tone?: Tone; title: string; children?: React.ReactNode }) {
   return (
-    <div className={cn("rounded-2xl border px-4 py-3 text-[13px]", toneStyles[tone])} role={tone === "danger" ? "alert" : "status"}>
+    <div className={cn("rounded-xl border px-4 py-3 text-[13px]", toneStyles[tone])} role={tone === "danger" ? "alert" : "status"}>
       <div className="font-medium">{title}</div>
       {children && <div className="mt-1 text-[13px] leading-relaxed opacity-90">{children}</div>}
     </div>

@@ -16,7 +16,7 @@ const COLS = [
 export function RuleDiagramView({ rule, onEdit }: { rule: RuleInput; onEdit?: (step: 1 | 2) => void }) {
   const d = ruleDiagram(rule);
   return (
-    <Card className="rounded-[32px] p-5 sm:p-7">
+    <Card className="p-5 sm:p-6">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h2 className="text-[28px]">Your rule at a glance</h2>
         <span className="text-xs text-fg-subtle">Built from the same values that are sent to the contract</span>
@@ -24,10 +24,10 @@ export function RuleDiagramView({ rule, onEdit }: { rule: RuleInput; onEdit?: (s
       <div className="mt-5 grid gap-3 md:grid-cols-[1fr_auto_1fr_auto_1fr] md:items-stretch">
         {COLS.map((c, i) => (
           <div key={c.key} className="contents">
-            <section aria-label={c.title.toUpperCase()} className={cn("rounded-3xl p-4 sm:p-5", c.tone)}>
+            <section aria-label={c.title.toUpperCase()} className={cn("rounded-xl p-4 sm:p-5", c.tone)}>
               <div className="flex items-center gap-2">
                 <span className={cn("size-2.5 rounded-full", c.dot)} aria-hidden />
-                <span className="text-[10px] uppercase tracking-[0.16em] text-fg-muted">{c.caption}</span>
+                <span className="text-xs text-fg-muted">{c.caption}</span>
               </div>
               <div className="mt-1 font-display text-[32px] leading-none text-fg">{c.title}</div>
               <ul className="mt-4 space-y-3">

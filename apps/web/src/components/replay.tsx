@@ -129,7 +129,7 @@ export function AutomationReplay({ initial = "checkpoint" }: { initial?: string 
         </div>
 
         <div className="rounded-xl border border-border bg-surface-2 p-4">
-          <div className="text-xs font-medium uppercase tracking-wide text-fg-subtle">{step === 0 ? "State before" : "State after this step"}</div>
+          <div className="text-xs font-medium text-fg-subtle">{step === 0 ? "State before" : "State after this step"}</div>
           <dl className="mt-2 space-y-1.5 text-[13px]">
             {rows.map((r, i) => {
               const changed = before && before[i]?.value !== r.value;

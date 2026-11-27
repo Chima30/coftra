@@ -54,7 +54,7 @@ export function TaskRow({ t, role }: { t: TaskView; role?: string }) {
   return (
     <Link
       href={`/tasks/${t.id}`}
-      className="group block rounded-3xl border border-border bg-surface px-5 py-4 transition-colors hover:border-fg/40 sm:px-6 sm:py-5"
+      className="group block rounded-2xl border border-border bg-surface px-5 py-4 transition-colors hover:border-fg/40 sm:px-6 sm:py-5"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">

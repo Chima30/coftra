@@ -6,12 +6,11 @@ import { Card, buttonStyles } from "./ui/primitives";
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden rounded-[40px] border border-border bg-surface px-6 py-12 sm:px-12 sm:py-16 lg:py-20">
-      <div className="atmosphere" aria-hidden />
+    <section className="relative overflow-hidden rounded-3xl border border-border bg-surface px-6 py-12 sm:px-12 sm:py-16 lg:py-20">
       <div className="relative max-w-3xl">
-        <p className="text-xs uppercase tracking-[0.16em] text-fg-subtle">Coftra · set it and forget it</p>
+        <p className="text-[13px] text-fg-subtle">Testnet · Base Sepolia and Reactive Lasna</p>
         <h1 className="mt-5 text-[44px] leading-[1.05] text-fg sm:text-6xl lg:text-[72px]">
-          On-chain tasks that <em className="italic">finish themselves.</em>
+          On-chain tasks that finish themselves
         </h1>
         <p className="mt-6 max-w-xl text-[13px] leading-relaxed text-fg-muted sm:text-sm">
           A transaction is only the start. Someone still has to check the outcome, release payments, revoke temporary
@@ -32,11 +31,11 @@ export function Hero() {
   );
 }
 
-/* Small original illustrations, one per engine. Geometric, pastel, decorative only. */
+/* Small original illustrations, one per engine. Geometric line drawings on a neutral disc, decorative only. */
 function CheckpointArt() {
   return (
     <svg viewBox="0 0 120 80" className="h-20 w-auto" aria-hidden>
-      <circle cx="40" cy="40" r="30" fill="var(--periwinkle)" />
+      <circle cx="40" cy="40" r="30" fill="var(--surface-2)" />
       <circle cx="80" cy="40" r="30" fill="none" stroke="var(--fg)" strokeWidth="1" />
       <path d="M68 41l8 8 15-17" fill="none" stroke="var(--fg)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
@@ -45,7 +44,7 @@ function CheckpointArt() {
 function CloseoutArt() {
   return (
     <svg viewBox="0 0 120 80" className="h-20 w-auto" aria-hidden>
-      <rect x="18" y="14" width="52" height="52" rx="26" fill="var(--mint)" />
+      <rect x="18" y="14" width="52" height="52" rx="26" fill="var(--surface-2)" />
       <path d="M92 28a22 22 0 1 0 4 20" fill="none" stroke="var(--fg)" strokeWidth="1.5" strokeLinecap="round" />
       <circle cx="96" cy="48" r="4" fill="var(--fg)" />
     </svg>
@@ -54,10 +53,10 @@ function CloseoutArt() {
 function FallbackArt() {
   return (
     <svg viewBox="0 0 120 80" className="h-20 w-auto" aria-hidden>
-      <circle cx="78" cy="40" r="28" fill="var(--gold)" />
+      <circle cx="78" cy="40" r="28" fill="var(--surface-2)" />
       <circle cx="46" cy="40" r="26" fill="none" stroke="var(--fg)" strokeWidth="1" />
       <path d="M46 24v16l10 7" fill="none" stroke="var(--fg)" strokeWidth="2" strokeLinecap="round" />
-      <circle cx="96" cy="22" r="6" fill="var(--coral)" />
+      <circle cx="96" cy="22" r="4" fill="var(--fg)" />
     </svg>
   );
 }
@@ -87,14 +86,14 @@ export function Engines() {
   return (
     <section aria-labelledby="engines-title" className="space-y-6">
       <div className="max-w-2xl">
-        <h2 id="engines-title" className="text-4xl text-fg sm:text-[44px]">Three engines, one rule.</h2>
+        <h2 id="engines-title" className="text-4xl text-fg sm:text-[44px]">Three engines, one rule</h2>
         <p className="mt-3 text-[13px] leading-relaxed text-fg-muted">Every Coftra task is enforced by the same three steps, each triggered by a real event rather than by this website.</p>
       </div>
       <div className="grid gap-4 md:grid-cols-3">
         {engines.map(({ art: Art, name, title, body }) => (
-          <Card key={name} className="flex flex-col rounded-[32px] p-6 sm:p-7">
+          <Card key={name} className="flex flex-col p-6">
             <Art />
-            <div className="mt-6 text-[11px] font-medium tracking-[0.14em] text-fg-subtle">{name}</div>
+            <div className="mt-6 font-mono text-xs text-fg-subtle">{name}</div>
             <h3 className="mt-2 text-[28px] text-fg">{title}</h3>
             <p className="mt-3 text-[13px] leading-relaxed text-fg-muted">{body}</p>
           </Card>
@@ -105,17 +104,17 @@ export function Engines() {
 }
 
 const flow = [
-  { n: "01", title: "Origin event", body: "Something happens on Base Sepolia: a verifier attests, an outcome lands, or a deadline passes.", tint: "bg-periwinkle" },
-  { n: "02", title: "Reactive Network", body: "Coftra's reactive contract on Lasna sees the event and decides, by its rule, whether to act.", tint: "bg-sky" },
-  { n: "03", title: "Coftra callback", body: "It requests a callback. The vault checks the sender and the task's state before moving anything.", tint: "bg-mint" },
-  { n: "04", title: "Verified outcome", body: "Funds move exactly as the rule says, and every hop is a transaction you can open.", tint: "bg-gold" },
+  { n: "01", title: "Origin event", body: "Something happens on Base Sepolia: a verifier attests, an outcome lands, or a deadline passes." },
+  { n: "02", title: "Reactive Network", body: "Coftra's reactive contract on Lasna sees the event and decides, by its rule, whether to act." },
+  { n: "03", title: "Coftra callback", body: "It requests a callback. The vault checks the sender and the task's state before moving anything." },
+  { n: "04", title: "Verified outcome", body: "Funds move exactly as the rule says, and every hop is a transaction you can open." },
 ];
 
 /** Origin event → Reactive Network → Coftra callback → Verified outcome. Horizontal on wide screens, stacked on phones. */
 export function Workflow() {
   return (
-    <section aria-labelledby="flow-title" className="rounded-[40px] border border-border bg-surface px-6 py-10 sm:px-10">
-      <h2 id="flow-title" className="max-w-xl text-4xl text-fg sm:text-[44px]">How a task finishes without you.</h2>
+    <section aria-labelledby="flow-title" className="rounded-3xl border border-border bg-surface px-6 py-10 sm:px-10">
+      <h2 id="flow-title" className="max-w-xl text-4xl text-fg sm:text-[44px]">How a task finishes without you</h2>
       <ol className="mt-10 grid gap-0 lg:grid-cols-4 lg:gap-4">
         {flow.map((s, i) => (
           <li key={s.n} className="relative flex gap-5 pb-8 last:pb-0 lg:flex-col lg:gap-0 lg:pb-0">
@@ -126,7 +125,7 @@ export function Workflow() {
                 <span className="absolute left-12 right-0 top-5 hidden h-px bg-border-strong lg:block" aria-hidden />
               </>
             )}
-            <span className={`relative z-[1] flex size-10 shrink-0 items-center justify-center rounded-full ${s.tint} text-xs font-medium text-[#242424]`}>
+            <span className={`relative z-[1] flex size-10 shrink-0 items-center justify-center rounded-full border border-border-strong bg-surface font-mono text-xs text-fg-muted`}>
               {s.n}
             </span>
             <div className="lg:mt-6 lg:pr-4">
