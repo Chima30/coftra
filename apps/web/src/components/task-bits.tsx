@@ -7,6 +7,7 @@ import { kindLabel, stateCopy, TaskKind, TaskState } from "@/lib/protocol";
 import { fmtToken, relTime, cn } from "@/lib/format";
 import { Badge } from "./ui/primitives";
 import { TaskLabelText } from "./task-label";
+import { HealthBadge, useHealthInputs } from "./health";
 
 export function StateBadge({ state }: { state: TaskState }) {
   const s = stateCopy[state];
@@ -44,6 +45,8 @@ export function FundsBar({ t }: { t: TaskView }) {
 
 export function TaskRow({ t, role }: { t: TaskView; role?: string }) {
   const state = t.task.state as TaskState;
+  const { healthOf } = useHealthInputs();
+  const health = healthOf(t);
   const progress =
     t.task.kind === TaskKind.ProjectBudget
       ? `${t.task.milestonesDone}/${t.task.milestoneCount} checkpoints`
@@ -59,6 +62,7 @@ export function TaskRow({ t, role }: { t: TaskView; role?: string }) {
             <span className="font-display text-xl leading-none text-fg">Task #{t.id.toString()}</span>
             <TaskLabelText taskId={t.id} />
             <StateBadge state={state} />
+            {health.label !== "Completed" && health.label !== "Expired" && health.label !== "Cancelled" && <HealthBadge h={health} />}
             {role && <Badge>{role}</Badge>}
           </div>
           <div className="mt-1 text-sm text-fg-muted">

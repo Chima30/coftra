@@ -9,6 +9,9 @@ import { PageHeader } from "@/components/app-shell";
 import { FundsBar, StateBadge } from "@/components/task-bits";
 import { TaskLabelEditor } from "@/components/task-label";
 import { IncomingCard } from "@/components/role-cards";
+import { TaskHealthCard } from "@/components/health";
+import { PolicyCard } from "@/components/policy";
+import { ConfirmAction } from "@/components/confirm-action";
 import { TaskStory } from "@/components/task-story";
 import { RecipientWelcome } from "@/components/recipient-welcome";
 import { SaveTemplateButton } from "@/components/saved-templates";
@@ -18,7 +21,7 @@ import { DeadlineCountdown } from "@/components/deadline";
 import { ShareTaskButton } from "@/components/share";
 import { useTaskLabel } from "@/lib/labels";
 import { Hex } from "@/components/hex";
-import { EmptyState, ErrorState, NotDeployed } from "@/components/states";
+import { EmptyState, ErrorState, NotDeployed, StaleNotice } from "@/components/states";
 import { RecentActivity, useBlockTime } from "@/components/activity-feed";
 import { TxStatusLine } from "@/components/tx-status";
 import { Badge, Button, Card, CardHeader, Input, Notice, Skeleton, Stat } from "@/components/ui/primitives";
@@ -41,11 +44,16 @@ export function TaskView({ params }: { params: Promise<{ id: string }> }) {
 
   if (!deploymentInfo) return <NotDeployed />;
   if (id === null) return <EmptyState title="Invalid task id" />;
-  if (q.error) return <ErrorState error={q.error} retry={() => q.refetch()} />;
+  if (q.error && !q.data) return <ErrorState error={q.error} retry={() => q.refetch()} />;
   if (q.isLoading || !q.data) return <Skeleton className="h-96" />;
   if (q.data.task.state === TaskState.None) return <EmptyState title={`Task #${raw} does not exist`} body="No task with this id has been created in the vault." />;
 
-  return <Detail t={q.data} />;
+  return (
+    <>
+      <StaleNotice error={q.error} at={q.dataUpdatedAt} />
+      <Detail t={q.data} />
+    </>
+  );
 }
 
 function Detail({ t }: { t: T }) {
@@ -110,6 +118,7 @@ function Detail({ t }: { t: T }) {
         <div className="min-w-0 space-y-6">
           {recipientView && <RecipientWelcome t={t} viewerIsRecipient={isRecipient} />}
           {address && <IncomingCard t={t} me={address} linked={false} />}
+          <TaskHealthCard t={t} />
           <Card>
             <div className="grid grid-cols-2 gap-5 p-5 md:grid-cols-4">
               <Stat label="Deposited" value={fmtToken(t.task.deposited)} />
@@ -133,23 +142,9 @@ function Detail({ t }: { t: T }) {
                 </li>
               ))}
             </ul>
-            <dl className="grid gap-x-6 gap-y-2 border-t border-border px-5 py-4 text-sm sm:grid-cols-[160px_1fr]">
-              <dt className="text-fg-muted">Owner</dt>
-              <dd><Hex value={t.task.owner} chainId={destination.id} /></dd>
-              {kind === TaskKind.ProjectBudget && (
-                <>
-                  <dt className="text-fg-muted">Recipient</dt>
-                  <dd><Hex value={t.task.recipient} chainId={destination.id} /></dd>
-                </>
-              )}
-              <dt className="text-fg-muted">Refund address</dt>
-              <dd><Hex value={t.task.refundTo} chainId={destination.id} /></dd>
-              <dt className="text-fg-muted">Deadline</dt>
-              <dd>{fmtDate(t.task.deadline)} <span className="text-fg-subtle">({relTime(t.task.deadline)})</span></dd>
-              <dt className="text-fg-muted">Config version</dt>
-              <dd>v{t.task.configVersion.toString()}</dd>
-            </dl>
           </Card>
+
+          <PolicyCard t={t} />
 
           {kind === TaskKind.ProjectBudget ? <Milestones t={t} verifierOf={verifierOf} isOwner={isOwner} /> : <SessionPanel t={t} isExecutor={isExecutor} />}
 
@@ -401,11 +396,20 @@ function Actions({ t, isOwner }: { t: T; isOwner: boolean }) {
             <label htmlFor="nd" className="font-medium">Extend deadline</label>
             <Input id="nd" type="datetime-local" value={newDeadline} onChange={(e) => setNewDeadline(e.target.value)} />
             <p className="text-xs text-fg-subtle">Bumps the config version: verifiers must re-attest against the new version.</p>
-            <Button
-              variant="secondary"
-              className="w-full"
-              disabled={!newDeadline || tx.busy}
-              onClick={() =>
+            <ConfirmAction
+              label="Extend"
+              title="Move the deadline later?"
+              disabled={!newDeadline}
+              busy={tx.busy}
+              confirmLabel="Extend deadline"
+              facts={{
+                who: "Only the owner, before the current deadline.",
+                funds: "None move. The deposit stays in the vault under the same rules.",
+                reversible: "No: a deadline can only move later. Verifiers have to attest again against the new configuration.",
+                payouts: "Unchanged.",
+                signature: "Your wallet asks you to sign.",
+              }}
+              onConfirm={() =>
                 tx.run("Extend deadline", {
                   address: d.vault,
                   abi: vaultAbi,
@@ -413,15 +417,25 @@ function Actions({ t, isOwner }: { t: T; isOwner: boolean }) {
                   args: [t.id, BigInt(Math.floor(new Date(newDeadline).getTime() / 1000))],
                 })
               }
-            >
-              Extend
-            </Button>
+            />
           </div>
         )}
         {canCancel && (
-          <Button variant="danger" className="w-full" disabled={tx.busy} onClick={() => tx.run("Cancel task", { address: d.vault, abi: vaultAbi, functionName: "cancel", args: [t.id] })}>
-            Cancel and return funds
-          </Button>
+          <ConfirmAction
+            label="Cancel and return funds"
+            variant="danger"
+            title="Cancel this task?"
+            busy={tx.busy}
+            confirmLabel="Cancel task"
+            facts={{
+              who: t.task.kind === TaskKind.SpendingSession ? "Only the owner, at any time while it's open." : "Only the owner, and only before activation.",
+              funds: `Everything not yet paid or spent (${fmtToken(t.available + t.reserved)}) goes to the refund address.${t.task.kind === TaskKind.SpendingSession ? " The executor loses access." : ""}`,
+              reversible: "No. A cancelled task is final.",
+              payouts: "Anything already paid or spent stays where it is.",
+              signature: "Your wallet asks you to sign.",
+            }}
+            onConfirm={() => tx.run("Cancel task", { address: d.vault, abi: vaultAbi, functionName: "cancel", args: [t.id] })}
+          />
         )}
         {known && state === TaskState.Active && now >= t.task.deadline && (
           <div className="space-y-2">
@@ -432,9 +446,20 @@ function Actions({ t, isOwner }: { t: T; isOwner: boolean }) {
                 : `If it hasn't by ${fmtDate(recoveryAt)}, anyone can run the same fallback by hand.`}
             </Notice>
             {now >= recoveryAt && (
-              <Button variant="secondary" className="w-full" disabled={tx.busy} onClick={() => tx.run("Manual expiry", { address: d.vault, abi: vaultAbi, functionName: "expire", args: [t.id] })}>
-                Run fallback manually
-              </Button>
+              <ConfirmAction
+                label="Run fallback manually"
+                title="Run the fallback for this task?"
+                busy={tx.busy}
+                confirmLabel="Run fallback"
+                facts={{
+                  who: "Anyone, from 30 minutes after the deadline. The result is the same as Reactive Network's.",
+                  funds: `The unspent balance (${fmtToken(t.available + t.reserved)}) goes to the refund address.`,
+                  reversible: "No. The task closes as Expired.",
+                  payouts: "Payouts already made stand.",
+                  signature: "Your wallet asks you to sign and pay the gas.",
+                }}
+                onConfirm={() => tx.run("Manual expiry", { address: d.vault, abi: vaultAbi, functionName: "expire", args: [t.id] })}
+              />
             )}
           </div>
         )}

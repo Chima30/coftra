@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { PageHeader } from "@/components/app-shell";
 import { TaskRow } from "@/components/task-bits";
-import { EmptyState, ErrorState, RequireWallet } from "@/components/states";
+import { EmptyState, ErrorState, RequireWallet, StaleNotice } from "@/components/states";
 import { Skeleton, buttonStyles } from "@/components/ui/primitives";
 import { useMyTasks } from "@/hooks/use-coftra";
 import { useAccount } from "wagmi";
@@ -32,7 +32,7 @@ export function VaultsView() {
 }
 
 function List() {
-  const { data, isLoading, error, refetch } = useMyTasks();
+  const { data, isLoading, error, refetch, dataUpdatedAt } = useMyTasks();
   const { address } = useAccount();
   const me = address ?? "";
   const [tab, setTab] = useState<(typeof tabs)[number]>("Open");
@@ -46,9 +46,10 @@ function List() {
       }),
     [data, tab],
   );
-  if (error) return <ErrorState error={error} retry={() => refetch()} />;
+  if (error && !data) return <ErrorState error={error} retry={() => refetch()} />;
   return (
     <div className="space-y-4">
+      <StaleNotice error={error} at={dataUpdatedAt} />
       <div className="flex flex-wrap items-center justify-between gap-3">
       <div className="flex flex-wrap gap-1.5" role="tablist" aria-label="Filter tasks">
         {tabs.map((t) => (

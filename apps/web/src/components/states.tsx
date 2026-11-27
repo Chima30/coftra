@@ -4,7 +4,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { useAccount } from "wagmi";
 import { useEffect, useState } from "react";
-import { Card, buttonStyles } from "./ui/primitives";
+import { Card, Notice, buttonStyles } from "./ui/primitives";
 import { ConnectButton } from "./app-shell";
 import { deploymentInfo } from "@/hooks/use-coftra";
 
@@ -61,6 +61,19 @@ export function RequireWallet({ children, why }: { children: ReactNode; why: str
   if (!mounted) return null;
   if (!isConnected) return <EmptyState title="Connect a wallet" body={why} action={<ConnectButton align="center" />} />;
   return <>{children}</>;
+}
+
+/** When a refresh fails but earlier data is on screen: say so, and when it was read. */
+export function StaleNotice({ error, at }: { error: unknown; at: number }) {
+  if (!error || !at) return null;
+  return (
+    <div className="mb-4">
+      <Notice tone="warning" title="Couldn't refresh from the chain">
+        Showing what was read at {new Date(at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}. It retries by itself; your funds
+        and tasks are unaffected.
+      </Notice>
+    </div>
+  );
 }
 
 export function ErrorState({ error, retry }: { error: unknown; retry?: () => void }) {

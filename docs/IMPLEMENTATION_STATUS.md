@@ -232,3 +232,15 @@ Resolved since the first version of this file: the frontend data paths (multical
 ## Next stage
 
 Real-wallet run of parts A–H in [WALLET_TEST.md](demo/WALLET_TEST.md) → check every hash on-chain and record it here → user testing with the [plan](demo/USER_TESTING.md).
+
+## Task Health, spending policy and recovery confirmations (27 Nov 2026)
+
+Frontend-only; contracts, ABIs, addresses and the four recorded proofs unchanged. See [TASK_HEALTH_AND_POLICY.md](TASK_HEALTH_AND_POLICY.md).
+
+| Feature | Unit-tested | Browser-checked | Real wallet |
+| --- | --- | --- | --- |
+| Task Health (task page card, task-row badge, Overview summary) | yes (7 tests) | task page, read-only, on task #4 | not yet |
+| Spending policy and "who can move funds" | — | task page, read-only | not yet |
+| Confirmations for cancel, manual fallback, extend deadline | — | — | not yet |
+| Proof Center: trigger, final state, contracts per run | — | yes | n/a |
+| Keep showing earlier data when a refresh fails, with its time | — | — | n/a |

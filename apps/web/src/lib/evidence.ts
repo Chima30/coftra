@@ -38,6 +38,12 @@ export type Scenario = {
   hops: [Hop, Hop, Hop];
   outcome: string[];
   caveat?: string;
+  /** What started the loop, in plain words. */
+  trigger: string;
+  /** The task's state after the callback, as the vault recorded it. */
+  finalState: string;
+  /** Which of the deployed contracts took part (names from CONTRACTS below). */
+  contracts: string[];
 };
 
 const BASE = baseSepolia.id;
@@ -78,6 +84,9 @@ export const SCENARIOS: Scenario[] = [
       },
     ],
     outcome: ["30 tUSDC transferred from the vault to the recipient", "Checkpoint 1 can never be paid again"],
+    trigger: "The named verifier attested checkpoint 1 on Base Sepolia",
+    finalState: "Task 1 Active · checkpoint 1 paid, checkpoint 2 pending",
+    contracts: ["CoftraMilestoneVerifier", "CoftraReactive", "CoftraVault"],
     caveat: "For the demo the task owner also acted as verifier. In normal use the verifier is a separate party you trust to judge the work.",
   },
   {
@@ -113,6 +122,9 @@ export const SCENARIOS: Scenario[] = [
       "Task 1 Completed; 20 tUSDC reserve returned to the owner",
       "The reactive contract saw TaskClosed and switched its cron off",
     ],
+    trigger: "The named verifier attested the last checkpoint on Base Sepolia",
+    finalState: "Task 1 Completed · 80 paid, 20 returned",
+    contracts: ["CoftraMilestoneVerifier", "CoftraReactive", "CoftraVault"],
   },
   {
     id: "session-closeout",
@@ -152,6 +164,9 @@ export const SCENARIOS: Scenario[] = [
       "The bot spent exactly 25 of 25; 15 tUSDC unspent returned to the owner",
       "NFT #1 is owned by the owner; a second spend by the bot reverts with WrongState(3) (checked with a read-only call)",
     ],
+    trigger: "The bot's paid mint delivered NFT #1 to the owner on Base Sepolia",
+    finalState: "Task 3 Completed · 25 spent, 15 returned, executor revoked",
+    contracts: ["CoftraVault", "CoftraDemoNFT (test only)", "CoftraReactive"],
   },
   {
     id: "fallback",
@@ -187,6 +202,9 @@ export const SCENARIOS: Scenario[] = [
       "20 tUSDC returned to the owner",
       "A late attestation is now rejected by the registry (NotAttestable)",
     ],
+    trigger: "A Reactive Cron tick on Lasna after the deadline (no user transaction)",
+    finalState: "Task 2 Expired · nothing paid, 20 returned",
+    contracts: ["CoftraReactive", "CoftraVault"],
   },
 ];
 

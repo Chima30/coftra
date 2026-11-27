@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ArrowRight, CheckCircle2, CircleDashed, Clock3, ExternalLink, XCircle } from "lucide-react";
-import { SCENARIOS, type Scenario } from "@/lib/evidence";
+import { CONTRACTS, SCENARIOS, type Scenario } from "@/lib/evidence";
 import { chainName, explorerTx } from "@/lib/chains";
 import { fmtNative } from "@/lib/format";
 import { useEvidenceCheck, type ReceiptCheck } from "@/hooks/use-evidence";
@@ -161,6 +161,23 @@ export function ScenarioCard({ s, main = false }: { s: Scenario; main?: boolean 
       <div className="mt-6 grid gap-5 border-t border-border pt-5 text-[13px] lg:grid-cols-[1fr_auto]">
         <div className="space-y-3">
           <div>
+            <dl className="mb-4 grid gap-x-4 gap-y-1.5 sm:grid-cols-[130px_1fr]">
+              <dt className="text-fg-subtle">Trigger</dt>
+              <dd>{s.trigger}</dd>
+              <dt className="text-fg-subtle">Final state</dt>
+              <dd>{s.finalState}</dd>
+              <dt className="text-fg-subtle">Contracts</dt>
+              <dd className="flex flex-col gap-1">
+                {s.contracts.map((name) => {
+                  const c = CONTRACTS.find((x) => x.name === name);
+                  return c ? (
+                    <span key={name} className="flex flex-wrap items-center gap-2">
+                      {name} <Hex value={c.address} chainId={c.chainId} />
+                    </span>
+                  ) : null;
+                })}
+              </dd>
+            </dl>
             <div className="text-[11px] uppercase tracking-[0.14em] text-fg-subtle">Task setup</div>
             <ul className="mt-1.5 space-y-1 text-fg-muted">
               {s.config.map((c) => (

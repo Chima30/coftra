@@ -7,16 +7,15 @@ import { Clock3, Radio, ShieldCheck } from "lucide-react";
 import { Engines, Hero, Workflow } from "@/components/landing";
 import { CoftraAutomationPipeline } from "@/components/automation-pipeline";
 import { PageHeader } from "@/components/app-shell";
-import { Card, CardHeader, Stat, Skeleton, buttonStyles } from "@/components/ui/primitives";
+import { Card, CardHeader, Skeleton, buttonStyles } from "@/components/ui/primitives";
 import { TaskRow } from "@/components/task-bits";
-import { EmptyState, ErrorState, NotDeployed } from "@/components/states";
+import { EmptyState, ErrorState, NotDeployed, StaleNotice } from "@/components/states";
 import { FundingSummary } from "@/components/funding";
 import { NeedsYou } from "@/components/needs-you";
+import { TaskHealthSummary } from "@/components/health";
 import { RecentActivity } from "@/components/activity-feed";
 import { FirstAutomationGuide, ShowGuideLink } from "@/components/first-guide";
 import { deploymentInfo, useMyTasks } from "@/hooks/use-coftra";
-import { fmtToken, relTime } from "@/lib/format";
-import { TaskState } from "@/lib/protocol";
 
 const trySteps = [
   {
@@ -103,30 +102,16 @@ function Intro() {
 }
 
 function Dashboard() {
-  const { data, isLoading, error, refetch } = useMyTasks();
-  if (error) return <ErrorState error={error} retry={() => refetch()} />;
+  const { data, isLoading, error, refetch, dataUpdatedAt } = useMyTasks();
+  if (error && !data) return <ErrorState error={error} retry={() => refetch()} />;
   const tasks = data?.tasks ?? [];
   const owned = tasks.filter((t) => data?.owned.has(t.id.toString()));
-  const active = owned.filter((t) => t.task.state === TaskState.Active);
-  const allocated = active.reduce((s, t) => s + t.available, 0n);
-  const reserved = active.reduce((s, t) => s + t.reserved, 0n);
-  const next = active.map((t) => t.task.deadline).sort((a, b) => Number(a - b))[0];
 
   return (
     <div className="space-y-6">
+      <StaleNotice error={error} at={dataUpdatedAt} />
       <FirstAutomationGuide />
-      <Card className="grid grid-cols-2 gap-5 p-5 md:grid-cols-4">
-        {isLoading ? (
-          Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-14" />)
-        ) : (
-          <>
-            <Stat label="Active tasks" value={active.length} sub={`${owned.length} created in total`} />
-            <Stat label="Held for active tasks" value={fmtToken(allocated)} />
-            <Stat label="Reserved for milestones / caps" value={fmtToken(reserved)} />
-            <Stat label="Next deadline" value={next ? relTime(next) : "—"} />
-          </>
-        )}
-      </Card>
+      {isLoading ? <Skeleton className="h-48" /> : <TaskHealthSummary tasks={owned} />}
 
       <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
         <div className="space-y-3">
