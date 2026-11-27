@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { BookOpen, FolderGit2, ShieldCheck } from "lucide-react";
+import { BookOpen, FileJson, FolderGit2, SearchCheck, ShieldCheck } from "lucide-react";
 import { PageHeader } from "@/components/app-shell";
 import { RecheckBanner, ScenarioCard } from "@/components/verified";
 import { AutomationReplay } from "@/components/replay";
@@ -63,6 +63,15 @@ export function ProofView() {
             </a>
             <a href={LINKS.github} target="_blank" rel="noreferrer" className={buttonStyles({ variant: "secondary", size: "sm" })}>
               <FolderGit2 className="size-4" /> Source on GitHub
+            </a>
+            <Link href="/verify" className={buttonStyles({ variant: "secondary", size: "sm" })}>
+              <SearchCheck className="size-4" /> Verify any task
+            </Link>
+            <Link href="/security" className={buttonStyles({ variant: "secondary", size: "sm" })}>
+              <ShieldCheck className="size-4" /> Security
+            </Link>
+            <a href="/proof.json" className={buttonStyles({ variant: "secondary", size: "sm" })}>
+              <FileJson className="size-4" /> proof.json
             </a>
           </div>
         </Card>

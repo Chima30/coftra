@@ -70,6 +70,26 @@ Each recorded run now also states:
 
 This sits alongside the existing five stages, the live receipt re-check, asset movements and shareable `/proof/<id>` links. All values come from the same recorded evidence; no hashes changed.
 
+## Verify a task (`/verify`)
+
+Anyone can check any task without a wallet: `/verify?task=<id>`. The page reads the task, its vault events and the receipts behind them from Base Sepolia, then recomputes:
+- the creation event matches what the vault stores (owner, amount)
+- every token is accounted for: deposited = released + refunded (+ still held while the task is open)
+- each checkpoint paid the rule's amount to the rule's recipient, once, with a matching token transfer in the receipt
+- automatic payments and closes were sent through Reactive's callback proxy and applied in the same transaction; owner overrides are listed as such
+- a session never spent past its cap, and its recorded total matches its spending
+- leftovers went to the refund address
+
+Nothing is stored or summarised by Coftra; the checks run in the browser each time (`src/lib/verify-task.ts`, unit-tested). Each task page links to it. There is no terminal version for arbitrary tasks yet; `pnpm --dir apps/web verify:proofs` re-checks the four recorded runs.
+
+## Security (`/security`)
+
+Fourteen attacks someone might try against a task's money, what stops each one, and the Foundry tests that show it fails (28 tests, linked to the source). Some entries also say what was observed on testnet in the recorded runs. A unit test (`security.test.ts`) fails if the page cites a test that doesn't exist. The page says plainly that Coftra is unaudited and that the tests don't prove there are no other attacks.
+
+## Machine-readable proof (`/proof.json`)
+
+The recorded evidence as JSON: contracts (with explorer and Sourcify links), the four runs with every hop's transaction and explorer link, observed costs, and how to re-verify. It's the same data the Proof Center shows, prerendered at build time.
+
 ## Not in this release (would need new contracts)
 
 - Requiring several approvals before a payout (k-of-n verifiers or multisig).

@@ -8,13 +8,16 @@ import {
   Activity,
   BadgeCheck,
   BookOpen,
+  FileJson,
   FolderGit2,
   LayoutDashboard,
   LayoutTemplate,
   Menu,
   Moon,
   PlusCircle,
+  SearchCheck,
   Settings,
+  ShieldCheck,
   Sun,
   Vault,
   Wallet,
@@ -307,6 +310,15 @@ export function AppShell({ children }: { children: ReactNode }) {
             </a>
             <a href={LINKS.judgeQuickstart} target="_blank" rel="noreferrer" className="inline-flex min-h-6 items-center gap-2 hover:text-fg">
               <BookOpen className="size-3.5" aria-hidden /> Docs and judge guide
+            </a>
+            <Link href="/verify" className="inline-flex min-h-6 items-center gap-2 hover:text-fg">
+              <SearchCheck className="size-3.5" aria-hidden /> Verify a task
+            </Link>
+            <Link href="/security" className="inline-flex min-h-6 items-center gap-2 hover:text-fg">
+              <ShieldCheck className="size-3.5" aria-hidden /> Security
+            </Link>
+            <a href="/proof.json" className="inline-flex min-h-6 items-center gap-2 hover:text-fg">
+              <FileJson className="size-3.5" aria-hidden /> proof.json
             </a>
           </div>
           <NetworkStatus />

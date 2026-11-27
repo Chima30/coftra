@@ -475,6 +475,9 @@ function Actions({ t, isOwner }: { t: T; isOwner: boolean }) {
         )}
         {isTerminal(state) && <p className="text-fg-muted">This task is final. Nothing can reopen it or move its funds again.</p>}
         <ShareTaskButton taskId={t.id} forRecipient={t.task.kind === TaskKind.ProjectBudget} />
+        <Link href={`/verify?task=${t.id}`} className="block text-center text-[13px] text-fg-muted underline hover:text-fg">
+          Verify this task&apos;s payments on-chain
+        </Link>
         {isOwner && (
           <div className="flex justify-center">
             <SaveTemplateButton build={(name) => templateFromTask(t, name)} defaultName={label || `Repeat of task #${t.id}`} />
