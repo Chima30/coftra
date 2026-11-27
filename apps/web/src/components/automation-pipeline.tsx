@@ -156,7 +156,7 @@ export function CoftraAutomationPipeline() {
       </ul>
 
       {/* Desktop and tablet: wide left-to-right pipeline. */}
-      <svg viewBox="0 0 1040 400" className="mt-4 hidden w-full md:block" aria-hidden fontFamily="var(--font-plex-mono), monospace">
+      <svg viewBox="0 0 1040 400" className="mt-4 hidden w-full md:block" aria-hidden fontFamily="var(--font-ui), sans-serif">
         <defs>
           <filter id="coftra-hub-glow" x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur stdDeviation="24" />

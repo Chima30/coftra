@@ -92,9 +92,9 @@
   --color-mint: var(--mint);
   --color-coral: var(--coral);
   --color-gold: var(--gold);
-  --font-sans: var(--font-plex-mono);
+  --font-sans: var(--font-ui);
   --font-mono: var(--font-plex-mono);
-  --font-display: var(--font-serif);
+  --font-display: var(--font-ui);
 }
 
 html {
@@ -107,21 +107,21 @@ html.dark {
 body {
   background: var(--bg);
   color: var(--fg);
-  font-family: var(--font-plex-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 14px;
+  font-family: var(--font-ui), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 15px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Editorial serif for headings, always regular weight. */
+/* Headings use the same sans-serif as the text, a little heavier and tighter. */
 h1,
 h2,
 h3,
 .font-display {
-  font-family: var(--font-serif), Georgia, "Times New Roman", serif;
-  font-weight: 400;
-  letter-spacing: -0.012em;
-  line-height: 1.15;
+  font-family: var(--font-ui), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
 }
 
 :focus-visible {
